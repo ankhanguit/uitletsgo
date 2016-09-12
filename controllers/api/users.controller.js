@@ -21,7 +21,7 @@ function authenticateUser(req, res) {
             if (user) {
                 // authentication successful
                 var token = jwt.sign({ sub: user._id }, config.secret);
-                createToken(token);
+                createToken(user._id.toString(), token);
 
                 var msg = {'message':token, 'successful': 'true', 'info': user};
 
@@ -89,8 +89,8 @@ function deleteUser(req, res) {
         });
 }
 
-function createToken(token){
-    tokenService.create(token)
+function createToken(author, token){
+    tokenService.create(author, token)
         .then(function (subMsg) {
         }).catch(function (subErr) {
 

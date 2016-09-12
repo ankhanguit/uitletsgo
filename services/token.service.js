@@ -10,6 +10,7 @@ var service = {};
 service.authenticate = authenticate;
 service.create = create;
 service.delete = _delete;
+service.find = findToken;
 
 module.exports = service;
 
@@ -31,7 +32,7 @@ function authenticate(token) {
     return deferred.promise;
 }
 
-function create(token) {
+function create(author, token) {
     var deferred = Q.defer();
     // validation
     db.token.findOne(
@@ -48,7 +49,7 @@ function create(token) {
         });
 
     function createToken() {
-        var objInsert = {'token' : token};
+        var objInsert = {'author': author, 'token' : token};
         db.token.insert(
             objInsert,
             function (err, doc) {
@@ -61,15 +62,33 @@ function create(token) {
     return deferred.promise;
 }
 
-function _delete(token) {
+function _delete(author, token) {
     var deferred = Q.defer();
 
     db.token.remove(
-        { token: token},
+        {author: author, token: token},
         function (err) {
             if (err) deferred.reject(err.name + ': ' + err.message);
-            deferred.resolve();
+            deferred.resolve('Token ' + token + ' match');
         });
 
+    return deferred.promise;
+}
+
+function findToken(token){
+    var deferred = Q.defer();
+    // validation
+    db.token.findOne(
+        { token: token },
+        function (err, token) {
+            if (err) deferred.reject(err.name + ': ' + err.message);
+
+            if (token) {
+                // username already exists
+                deferred.resolve('Token ' + token + ' match');
+            } else {
+                deferred.reject('Token ' + token + ' no match');
+            }
+        });
     return deferred.promise;
 }
