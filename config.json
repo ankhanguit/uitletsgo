@@ -1,6 +1,6 @@
 ﻿{
     "connectionString": "mongodb://localhost:27017/uitgo",
-    "apiUrl": "https://uitletsgo.herokuapp.com/api",
+    "apiUrl": "https://uitgo.herokuapp.com/api",
     "secret": "REPLACE THIS WITH YOUR OWN SECRET, IT CAN BE ANY STRING",
     "serverPort": 80,
     "transporter": "uitgomailer@gmail.com",
