@@ -3,35 +3,15 @@ var _ = require('lodash');
 var Q = require('q');
 var mongo = require('mongoskin');
 var db = mongo.db(process.env.MONGODB_URI, { native_parser: true });
-db.bind('token');
+db.bind('members');
 
 var service = {};
 
-service.authenticate = authenticate;
 service.create = create;
 service.delete = _delete;
-service.find = findToken;
-service.checkToken = checkTokenAuthor;
+service.find = find;
 
 module.exports = service;
-
-function authenticate(token) {
-    var deferred = Q.defer();
-
-    db.token.findOne({ TOKEN: token }, function (err, tokenMsg) {
-        if (err) deferred.reject(err.name + ': ' + err.message);
-
-        if (tokenMsg) {
-            // authentication successful
-            deferred.resolve(tokenMsg);
-        } else {
-            // authentication failed
-            deferred.resolve();
-        }
-    });
-
-    return deferred.promise;
-}
 
 function create(author, token) {
     var deferred = Q.defer();
