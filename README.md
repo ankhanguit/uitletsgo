@@ -1,4 +1,4 @@
-# mean-stack-registration-login-example
+# UITGO APP for anyone
 
 MEAN Stack User Registration and Login Example Application
 
