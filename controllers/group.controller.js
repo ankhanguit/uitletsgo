@@ -98,5 +98,30 @@ router.post('/get', function (req, res) {
     });
 });
 
+router.post('/search', function (req, res) {
+    // register using api to maintain clean separation between layers
+    request.post({
+        url: config.apiUrl + '/groups/search',
+        form: req.body,
+        json: true
+    }, function (error, response, body) {
+        if (error) {
+            return res.status(401).json({'message':'An error occurred' , 'successful' : 'false', 'info' : ''});
+        }
+
+        if (response.statusCode == 200) {
+            return res.status(200).json({'message':'Get your list groups successful' , 'successful' : 'true', 'info' : body.groups});
+        }else if(response.statusCode == 401){
+            res.status(401).json({'message':'Please login before create group' , 'successful' : 'false', 'info' : ''});
+        }else if(response.statusCode == 500){
+            res.status(500).json({'message':"Sorry, no group were found" , 'successful' : 'false', 'info' : ''});
+        }
+        else{
+            // return success message
+            res.status(401).json({'message':"Sorry, no group were found " , 'successful' : 'false', 'info' : ''});
+        }
+    });
+});
+
 
 module.exports = router;

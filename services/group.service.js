@@ -134,11 +134,19 @@ function _delete(_id, author) {
 
 function getList(author) {
     var deferred = Q.defer();
+    var groupsResult;
 
     db.groups.find({AUTHOR: author}).toArray( function (err, groups) {
         if (err) deferred.reject(err.name + ': ' + err.message);
 
-        deferred.resolve(groups);
+        if (groups) {
+            for (i = 0; i < groups.length; i++) {
+                groups[i] = _.omit(groups[i], 'STATUS', 'LOCK', 'CREATEDATE', 'UPDATEDATE');
+
+            }
+            deferred.resolve(groups);
+        }
+
     });
 
     return deferred.promise;
@@ -146,11 +154,35 @@ function getList(author) {
 
 function findByName(groupName){
     var deferred = Q.defer();
-
-    db.groups.find({NAME: new RegExp(groupName, "i")}).toArray( function (err, groups) {
+    db.groups.aggregate([
+        {
+            $match:
+            {
+                'NAME': new RegExp(groupName, "i")
+            }
+        },
+        {
+            $lookup:
+            {
+                from: "users",
+                localField: "AUTHOR",
+                foreignField: "_id",
+                as: "AUTHOR_INFO"
+            }
+        }
+    ],function (err, groups) {
         if (err) deferred.reject(err.name + ': ' + err.message);
 
+        for (i = 0; i < groups.length; i++) {
+            groups[i] = _.omit(groups[i], 'STATUS', 'LOCK', 'CREATEDATE', 'UPDATEDATE');
+            if(groups[i].AUTHOR_INFO[0].USERNAME){
+                groups[i].AUTHOR_INFO = groups[i].AUTHOR_INFO[0].USERNAME;
+            }else{
+                groups[i].AUTHOR_INFO = "";
+            }
+        }
         deferred.resolve(groups);
+
     });
 
     return deferred.promise;

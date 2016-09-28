@@ -10,6 +10,7 @@ router.post('/add', createGroup);
 router.delete('/delete', deleteGroup);
 router.put('/update', updateGroup);
 router.post('/get', getList);
+router.post('/search', search);
 
 module.exports = router;
 
@@ -113,7 +114,7 @@ function updateGroup(req, res){
     }
 }
 
-function getList(req, res){
+function search(req, res){
 
     var author = req.body.author;
     var token = req.body.token;
@@ -135,7 +136,40 @@ function getList(req, res){
     function getListGroups(){
         groupService.getByName(groupName)
             .then(function (groups) {
+                if(groups){
+                    res.status(200).send({groups: groups});
+                }else{
+                    res.sendStatus(500);
+                }
 
+            })
+            .catch(function (err) {
+                res.sendStatus(503);
+            });
+    }
+}
+
+function getList(req, res){
+
+    var author = req.body.author;
+    var token = req.body.token;
+
+    tokenService.checkToken(author, token)
+        .then(function (subMsg) {
+            if(subMsg && subMsg.success == true){
+                console.log("validate user authenticate success, userId =" + author);
+                getListGroups();
+            }else{
+                res.sendStatus(401);
+            }
+
+        }).catch(function (subErr) {
+        res.sendStatus(401);
+    });
+
+    function getListGroups(){
+        groupService.get(author)
+            .then(function (groups) {
                 if(groups){
                     res.status(200).send({groups: groups});
                 }else{
