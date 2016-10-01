@@ -163,8 +163,12 @@ function findByName(groupName){
 
     ],function (err, groups) {
         if (err) deferred.reject(err.name + ': ' + err.message);
-        console.log(groups);
-        deferred.resolve(groups);
+		
+		if(!_.isEmpty(groups)){
+			deferred.resolve(groups);
+        }else{
+            deferred.resolve();
+        }
     });
 
     return deferred.promise;
