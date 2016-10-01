@@ -23,7 +23,11 @@ app.use('/api', expressJwt({ secret: config.secret }).unless({ path: [
     '/api/groups/update',
     '/api/groups/get',
     '/api/groups/search',
-    '/api/groups/delete'
+    '/api/groups/delete',
+    '/api/members/leave',
+    '/api/members/permit',
+    '/api/members/lock',
+    '/api/members/join'
 
 ] }));
 
@@ -31,8 +35,10 @@ app.use('/api', expressJwt({ secret: config.secret }).unless({ path: [
 app.use('/site', require('./controllers/site.controller'));
 app.use('/user', require('./controllers/user.controller'));
 app.use('/group', require('./controllers/group.controller'));
+app.use('/member', require('./controllers/member.controller'));
 app.use('/api/users', require('./controllers/api/users.controller'));
 app.use('/api/groups', require('./controllers/api/groups.controller'));
+app.use('/api/members', require('./controllers/api/members.controller'));
 
 // make '/app' default route
 app.get('/', function (req, res) {
