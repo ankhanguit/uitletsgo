@@ -22,7 +22,7 @@ app.use('/api', expressJwt({ secret: config.secret }).unless({ path: [
     '/api/groups/add',
     '/api/groups/update',
     '/api/groups/get',
-	'/api/groups/search',
+    '/api/groups/search',
     '/api/groups/delete'
 
 ] }));

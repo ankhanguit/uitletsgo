@@ -110,15 +110,12 @@ router.post('/search', function (req, res) {
         }
 
         if (response.statusCode == 200) {
-            return res.status(200).json({'message':'Get your list groups successful' , 'successful' : 'true', 'info' : body.groups});
-        }else if(response.statusCode == 401){
-            res.status(401).json({'message':'Please login before create group' , 'successful' : 'false', 'info' : ''});
+            return res.status(200).json({'message':'Search groups successful' , 'successful' : 'true', 'info' : body.groups});
         }else if(response.statusCode == 500){
             res.status(500).json({'message':"Sorry, no group were found" , 'successful' : 'false', 'info' : ''});
         }
         else{
-            // return success message
-            res.status(401).json({'message':"Sorry, no group were found " , 'successful' : 'false', 'info' : ''});
+            res.status(501).json({'message':"Database has trouble" , 'successful' : 'false', 'info' : ''});
         }
     });
 });

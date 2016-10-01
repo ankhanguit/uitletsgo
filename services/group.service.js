@@ -44,7 +44,7 @@ function create(groupParam) {
 
     // set user object to userParam without the cleartext password
     var set = {
-        AUTHOR:groupParam.author,
+        AUTHOR:mongo.helper.toObjectID(groupParam.author),
         NAME:groupParam.name,
         DECRIPTION:groupParam.decription,
         CODE: groupCode,
@@ -155,34 +155,16 @@ function getList(author) {
 function findByName(groupName){
     var deferred = Q.defer();
     db.groups.aggregate([
-        {
-            $match:
-            {
-                'NAME': new RegExp(groupName, "i")
-            }
-        },
-        {
-            $lookup:
-            {
-                from: "users",
-                localField: "AUTHOR",
-                foreignField: "_id",
-                as: "AUTHOR_INFO"
-            }
-        }
+        { $match: {'NAME': new RegExp(groupName, "i")}},
+        { $lookup: { from: "users", localField: "AUTHOR", foreignField: "_id", as: "AUTHOR_INFO"}},
+        { $limit : 20 },
+        { $unwind : "$AUTHOR_INFO"},
+        { $project: { NAME : 1, DECRIPTION : 1, AUTHOR_FIRSTNAME : "$AUTHOR_INFO.FIRSTNAME" ,AUTHOR_LASTNAME : "$AUTHOR_INFO.LASTNAME" , CODE: 1}}
+
     ],function (err, groups) {
         if (err) deferred.reject(err.name + ': ' + err.message);
-
-        for (i = 0; i < groups.length; i++) {
-            groups[i] = _.omit(groups[i], 'STATUS', 'LOCK', 'CREATEDATE', 'UPDATEDATE');
-            if(groups[i].AUTHOR_INFO[0].USERNAME){
-                groups[i].AUTHOR_INFO = groups[i].AUTHOR_INFO[0].USERNAME;
-            }else{
-                groups[i].AUTHOR_INFO = "";
-            }
-        }
+        console.log(groups);
         deferred.resolve(groups);
-
     });
 
     return deferred.promise;
