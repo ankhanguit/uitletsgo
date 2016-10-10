@@ -1,6 +1,7 @@
 ﻿require('rootpath')();
 var express = require('express');
 var app = express();
+var socket = require('socket.io');
 var session = require('express-session');
 var bodyParser = require('body-parser');
 var expressJwt = require('express-jwt');
@@ -49,3 +50,6 @@ app.get('/', function (req, res) {
 var server = app.listen(process.env.PORT, function () {
     console.log('Server listening at http://' + server.address().address + ':' + server.address().port);
 });
+
+var io = socket.listen(server);
+require('./socket/routes')(app, io);
