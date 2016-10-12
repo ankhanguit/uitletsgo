@@ -1,4 +1,22 @@
-﻿var config = require('config.json');
+﻿/**
+ * Created by panda94 on 09/12/2016.
+ * Controller site handle
+ *
+ * F- AuthenticateUser: (http://host/api/users/authenticate), middleware: (http://host/site/login) : user login system
+ * F- RegisterUser: (http://host/api/users/register), middleware: (http://host/site/register) : user register account
+ * F- GetCurrentUser: (http://host/site/current)
+ * F- UpdateUser: (http://host/api/users/update), middleware: (http://host/user/update) : update user profile
+ * F- RequestChangePassword: (http://host/api/users/requestChangePassword),
+ *      middleware: (http://host/user/requestChangePassword) : request code new password
+ * F- ValidateDynamicCode: (http://host/api/users/validateDynamicCode),
+ *      middleware: (http://host/user/validateDynamicCode) : validate code new password
+ * F- NewPassword: (http://host/api/users/newPassword), middleware: (http://host/user/newPassword) : new password (forgot case)
+ * F- UpdatePassword (http://host/api/users/updatePassword), middleware: (http://host/user/updatePassword) : update password
+ *
+ * Update: 10/12/2016.
+ */
+
+var config = require('config.json');
 var express = require('express');
 var router = express.Router();
 
@@ -22,6 +40,11 @@ router.delete('/:_id', deleteUser);
 
 module.exports = router;
 
+/**
+ * POST: user login
+ * @param req: username, password
+ * @param res
+ */
 function authenticateUser(req, res) {
     userService.authenticate(req.body.username, req.body.password)
         .then(function (user) {
@@ -35,6 +58,11 @@ function authenticateUser(req, res) {
         });
 }
 
+/**
+ * POST: user register
+ * @param req: username, password, phone, email
+ * @param res
+ */
 function registerUser(req, res) {
     userService.create(req.body)
         .then(function () {
@@ -45,6 +73,11 @@ function registerUser(req, res) {
         });
 }
 
+/**
+ * Get Current user
+ * @param req
+ * @param res
+ */
 function getCurrentUser(req, res) {
     userService.getById(req.user.sub)
         .then(function (user) {
@@ -59,6 +92,11 @@ function getCurrentUser(req, res) {
         });
 }
 
+/**
+ * PUT: update user profile
+ * @param req: firstname, lastname, birthday, gender, address
+ * @param res
+ */
 function updateUser(req, res) {
     var author = req.body.id;
     var token = req.body.token;
@@ -85,6 +123,11 @@ function updateUser(req, res) {
     });
 }
 
+/**
+ * POST: request code new password
+ * @param req: id = Id user
+ * @param res
+ */
 function requestChangePassword(req, res){
     var userId = req.body.id;
     console.log("request change password, userid = " + userId);
@@ -102,6 +145,11 @@ function requestChangePassword(req, res){
         });
 }
 
+/**
+ * POST: validate code new password
+ * @param req: id = Id user, code
+ * @param res
+ */
 function validateDynamicCode(req, res){
     var userId = req.body.id;
     var code = req.body.code;
@@ -121,6 +169,11 @@ function validateDynamicCode(req, res){
         });
 }
 
+/**
+ * PUT: new password
+ * @param req: id = Id user, password
+ * @param res
+ */
 function newPassword(req, res){
     var userId = req.body.id;
     var password = req.body.password;
@@ -140,6 +193,11 @@ function newPassword(req, res){
         });
 }
 
+/**
+ * PUT: update password
+ * @param req: id = Id user, password; newpassword
+ * @param res
+ */
 function updatePassword(req, res){
     var userId = req.body.id;
     var password = req.body.password;
@@ -170,11 +228,16 @@ function updatePassword(req, res){
     console.log("change password, userid = " + userId);
 }
 
+/**
+ * DELETE: delete user
+ * @param req: userId
+ * @param res
+ */
 function deleteUser(req, res) {
     var userId = req.user.sub;
     if (req.params._id !== userId) {
         // can only delete own account
-        return res.status(401).send('You can only delete your own account');
+        res.status(401).send('You can only delete your own account');
     }
 
     userService.delete(userId)
@@ -186,6 +249,11 @@ function deleteUser(req, res) {
         });
 }
 
+/**
+ * function : create token when login successful
+ * @param author
+ * @param token
+ */
 function createToken(author, token){
     tokenService.create(author, token)
         .then(function (subMsg) {
@@ -194,6 +262,13 @@ function createToken(author, token){
     });
 }
 
+/**
+ * Send code new password to user email
+ * @param reciever
+ * @param userId
+ * @param req
+ * @param res
+ */
 function sendMail(reciever, userId, req, res){
     var code = Math.floor(1000 + Math.random() * 9000);
     var text = "Your code to change password is : " + code;
@@ -213,6 +288,11 @@ function sendMail(reciever, userId, req, res){
         });
 }
 
+/**
+ * update dynamic code
+ * @param userId
+ * @param code
+ */
 function updateDynamicCode(userId, code){
     userService.updateDynamicCode(userId, code)
         .then(function (user) {
