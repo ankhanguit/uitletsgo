@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 var request = require('request');
 var config = require('config.json');
+
+var utils = require('logic/utils.logic');
 var tokenService = require('services/token.service');
 
 
@@ -14,14 +16,14 @@ router.post('/login', function (req, res) {
         json: true
     }, function (error, response, body) {
         if (error) {
-            res.status(401).json({'message':'An error occurred' , 'successful' : 'false', 'info' : ''});
+            res.status(401).json({'message':utils.message("MSG001-CM-I") , 'successful' : 'false', 'info' : ''});
+        }else if (res.statusCode == 400) {
+            res.status(400).json({'message':response.body , 'successful' : 'false', 'info' : ''});
+        }else if(res.statusCode == 200){
+            res.status(200).json({'message':body.token , 'successful' : 'true', 'info' : body.user});
+        }else{
+            res.status(500).json({'message':utils.message("MSG003-CM-E"), 'successful' : 'false', 'info' : ''});
         }
-
-        if (!body.message) {
-            res.status(401).json({'message':'Username or password is incorrect' , 'successful' : 'false', 'info' : ''});
-        }
-
-        res.status(200).json(body.message);
     });
 });
 
@@ -33,15 +35,14 @@ router.post('/register', function (req, res) {
         json: true
     }, function (error, response, body) {
         if (error) {
-            return res.status(401).json({'message':'An error occurred' , 'successful' : 'false', 'info' : ''});
+            res.status(401).json({'message':utils.message("MSG001-CM-I") , 'successful' : 'false', 'info' : ''});
+        } else if(response.statusCode == 200){
+            res.status(200).json({'message':utils.message("MSG001-ST-I") , 'successful' : 'true', 'info' : ''});
+        }else if (response.statusCode == 400) {
+            res.status(400).json({'message':response.body , 'successful' : 'false', 'info' : ''});
+        }else{
+            res.status(500).json({'message':utils.message("MSG003-CM-E"), 'successful' : 'false', 'info' : ''});
         }
-
-        if (response.statusCode !== 200) {
-            return res.status(401).json({'message':response.body , 'successful' : 'false', 'info' : ''});
-        }
-
-        // return success message
-        res.status(401).json({'message':'Register successful' , 'successful' : 'true', 'info' : ''});
     });
 });
 
@@ -54,10 +55,10 @@ router.post('/logout', function (req, res) {
                 }
             })
             .catch(function (err) {
-                return res.status(401).json({'message':'token no match' , 'successful' : 'false', 'info' : ''});
+                return res.status(401).json({'message':utils.message("MSG005-ST-E") , 'successful' : 'false', 'info' : ''});
             });
     }else{
-        res.status(401).json({'message':'validate error' , 'successful' : 'false', 'info' : ''});
+        res.status(401).json({'message':utils.message("MSG004-ST-E") , 'successful' : 'false', 'info' : ''});
     }
 });
 
@@ -71,21 +72,11 @@ router.post('/authenticate', function (req, res) {
 
             })
             .catch(function (err) {
-                return res.status(401).json({'message':'token no match' , 'successful' : 'false', 'info' : ''});
+                return res.status(401).json({'message':utils.message("MSG005-ST-E") , 'successful' : 'false', 'info' : ''});
             });
     }else{
-        res.status(401).json({'message':'validate error' , 'successful' : 'false', 'info' : ''});
+        res.status(401).json({'message':utils.message("MSG004-ST-E") , 'successful' : 'false', 'info' : ''});
     }
 });
-
-router.get('/get', function (req, res) {
-    // register using api to maintain clean separation between layers
-
-        res.status(401).json({'message':'validate error' , 'successful' : 'false', 'info' : ''});
-
-});
-
-
-
 
 module.exports = router;

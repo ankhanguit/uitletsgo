@@ -1,0 +1,18 @@
+{
+  "MSG001-CM-I" : "An error occurred",
+  "MSG002-CM-E" : "Database collection has trouble ",
+  "MSG003-CM-E" : "Exception status code ",
+
+  "MSG001-ST-I" : "Register successful",
+
+  "MSG001-ST-E" : "Username %s is already taken",
+  "MSG002-ST-E" : "Account not found",
+  "MSG003-ST-E" : "Username or password is incorrect",
+  "MSG004-ST-E" : "validate error",
+  "MSG005-ST-E" : "token no match",
+  "MSG006-ST-E" : "Validate code failure",
+
+  "MSG001-I" : "",
+  "MSG002-I" : "",
+  "MSG003-I" : ""
+}

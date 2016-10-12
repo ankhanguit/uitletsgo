@@ -1,4 +1,5 @@
 ﻿var config = require('config.json');
+var utils = require('logic/utils.logic');
 var _ = require('lodash');
 var jwt = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
@@ -25,14 +26,17 @@ function authenticate(username, password) {
     var deferred = Q.defer();
 
     db.users.findOne({ USERNAME: username }, function (err, user) {
-        if (err) deferred.reject(err.name + ': ' + err.message);
+        if (err){
+            deferred.reject(utils.message("MSG002-CM-E"));
+            console.log(err.name + ': ' + err.message);
+        }
 
         if (user && bcrypt.compareSync(password, user.hash)) {
             // authentication successful
             deferred.resolve(_.omit(user, 'hash' ,'STATUS', 'LOCK'));
         } else {
             // authentication failed
-            deferred.resolve();
+            deferred.reject(utils.message("MSG003-ST-E"));
         }
     });
 
@@ -64,11 +68,14 @@ function create(userParam) {
     db.users.findOne(
         { USERNAME: userParam.username, EMAIL:userParam.email },
         function (err, user) {
-            if (err) deferred.reject(err.name + ': ' + err.message);
+            if (err){
+                deferred.reject(utils.message("MSG002-CM-E"));
+                console.log(err.name + ': ' + err.message);
+            }
 
             if (user) {
                 // username already exists
-                deferred.reject('Username ' + userParam.username + ' is already taken');
+                deferred.reject(utils.message("MSG001-ST-E", userParam.username));
             } else {
                 createUser();
             }
@@ -100,7 +107,10 @@ function create(userParam) {
         db.users.insert(
             user,
             function (err, doc) {
-                if (err) deferred.reject(err.name + ': ' + err.message);
+                if (err) {
+                    deferred.reject(utils.message("MSG002-CM-E"));
+                    console.log(err.name + ': ' + err.message);
+                }
 
                 deferred.resolve();
             });

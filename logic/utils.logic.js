@@ -1,9 +1,11 @@
 var config = require('config.json');
+var _MESSAGE = require('message.json');
 var _ = require('lodash');
 var Q = require('q');
 var logic = {};
 
 logic.random = random;
+logic.message = message;
 
 module.exports = logic;
 
@@ -21,4 +23,13 @@ function random(length, chars) {
     }
 
     return result;
+}
+function message(msg) {
+    var args = [].slice.call(arguments, 1),
+        i = 0;
+
+    var str = _MESSAGE[msg];
+    return str.replace(/%s/g, function() {
+        return args[i++];
+    });
 }

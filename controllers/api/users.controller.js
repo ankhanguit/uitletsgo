@@ -25,17 +25,10 @@ module.exports = router;
 function authenticateUser(req, res) {
     userService.authenticate(req.body.username, req.body.password)
         .then(function (user) {
-            if (user) {
-                // authentication successful
-                var token = jwt.sign({ sub: user._id }, config.secret);
-                createToken(user._id.toString(), token);
-
-                var msg = {'message':token, 'successful': 'true', 'info': user};
-
-                res.send({ message: msg });
-            }else {
-                res.sendStatus(401);
-            }
+            // authentication successful
+            var token = jwt.sign({ sub: user._id }, config.secret);
+            createToken(user._id.toString(), token);
+            res.status(200).send({ user: user , token: token });
         })
         .catch(function (err) {
             res.status(400).send(err);
