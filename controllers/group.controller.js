@@ -1,8 +1,26 @@
+/**
+ * Created by panda94 on 09/12/2016.
+ * Controller group middleware
+ * F- Add: (http://host/group/add) : add new group to database
+ * F- Update: (http://host/group/update) : update group profile
+ * F- Delete: (http://host/group/delete) : remove group from database
+ * F- Get: (http://host/group/get) : get own group
+ * F- Search: (http://host/group/search) : search group (public)
+ *
+ * Update: 10/12/2016.
+ */
+
 var express = require('express');
 var router = express.Router();
 var request = require('request');
 var config = require('config.json');
 
+var utils = require('logic/utils.logic');
+
+/**
+ * POST: add group to database
+ * params: author = Id user, token, name = group name, decription
+ */
 router.post('/add', function (req, res) {
     // authenticate using api to maintain clean separation between layers
     request.post({
@@ -12,17 +30,25 @@ router.post('/add', function (req, res) {
     }, function (error, response, body) {
 
         if (error) {
-            res.status(401).json({'message':'An error occurred' , 'successful' : 'false', 'info' : ''});
+            // system error
+            res.status(401).json({'message':utils.message("MSG001-CM-I") , 'successful' : 'false', 'info' : ''});
         }else if( response.statusCode == 200 && body.group) {
-            res.status(200).json({'message':'Your group was created successful' , 'successful' : 'true', 'info' : body.group});
-        }else if(response.statusCode == 401){
-            res.status(401).json({'message':'Please login before create group' , 'successful' : 'false', 'info' : ''});
+            // create group successful
+            res.status(200).json({'message':utils.message("MSG001-GP-I") , 'successful' : 'true', 'info' : body.group});
+        }else if(response.statusCode == 400){
+            // database error, check token error
+            res.status(400).json({'message':response.body , 'successful' : 'false', 'info' : ''});
         } else{
-            res.status(400).json({'message':"Sorry, we can't create your group right now" , 'successful' : 'false', 'info' : ''});
+            // status exception
+            res.status(500).json({'message':utils.message("MSG003-CM-E"), 'successful' : 'false', 'info' : ''});
         }
     });
 });
 
+/**
+ * PUT: update group profile
+ * params: author = Id user, token, id = Id group, name = group name, decription
+ */
 router.put('/update', function (req, res) {
     // register using api to maintain clean separation between layers
     request.put({
@@ -31,23 +57,25 @@ router.put('/update', function (req, res) {
         json: true
     }, function (error, response, body) {
         if (error) {
-            return res.status(401).json({'message':'An error occurred' , 'successful' : 'false', 'info' : ''});
-        }
-
-        if (response.statusCode == 200) {
-            return res.status(401).json({'message':'Your group was updated successful' , 'successful' : 'true', 'info' : ''});
-        }else if(response.statusCode == 401) {
-            res.status(401).json({'message':'Please login before create group' , 'successful' : 'false', 'info' : ''});
-        }else if(response.statusCode == 500) {
-            res.status(500).json({'message':'Not your group or group not found' , 'successful' : 'false', 'info' : ''});
+            // system error
+            res.status(401).json({'message':utils.message("MSG001-CM-I") , 'successful' : 'false', 'info' : ''});
+        }else if (response.statusCode == 200) {
+            // update group profile successful
+            return res.status(401).json({'message':utils.message("MSG003-GP-I") , 'successful' : 'true', 'info' : ''});
+        }else if(response.statusCode == 400) {
+            // database error, check token error
+            res.status(400).json({'message':response.body , 'successful' : 'false', 'info' : ''});
         }else{
-            // return failure message
-            res.status(503).json({'message':"Sorry, we can't update your group right now " , 'successful' : 'false', 'info' : ''});
+            // status exception
+            res.status(500).json({'message':utils.message("MSG003-CM-E"), 'successful' : 'false', 'info' : ''});
         }
-
     });
 });
 
+/**
+ * DELETE: delete group
+ * params: author = Id user, token, id = Id group
+ */
 router.delete('/delete', function (req, res) {
     // register using api to maintain clean separation between layers
     request.delete({
@@ -56,23 +84,25 @@ router.delete('/delete', function (req, res) {
         json: true
     }, function (error, response, body) {
         if (error) {
-            return res.status(401).json({'message':'An error occurred' , 'successful' : 'false', 'info' : ''});
-        }
-
-        if (response.statusCode == 200) {
-            return res.status(200).json({'message':'Your group was deleted successful' , 'successful' : 'true', 'info' : ''});
-        }else if(response.statusCode == 401){
-            res.status(401).json({'message':'Please login before create group' , 'successful' : 'false', 'info' : ''});
-        }else if(response.statusCode == 500){
-            res.status(500).json({'message':'Not your group or group not found' , 'successful' : 'false', 'info' : ''});
-        }
-        else{
-            // return success message
-            res.status(401).json({'message':"Sorry, we can't delete your group right now " , 'successful' : 'false', 'info' : ''});
+            // system error
+            res.status(401).json({'message':utils.message("MSG001-CM-I") , 'successful' : 'false', 'info' : ''});
+        }else if (response.statusCode == 200) {
+            // delete group successful
+            return res.status(200).json({'message':utils.message("MSG007-GP-I") , 'successful' : 'true', 'info' : ''});
+        }else if(response.statusCode == 400){
+            // database error, find groups by id fail
+            res.status(400).json({'message':response.body , 'successful' : 'false', 'info' : ''});
+        }else{
+            // status exception
+            res.status(500).json({'message':utils.message("MSG003-CM-E"), 'successful' : 'false', 'info' : ''});
         }
     });
 });
 
+/**
+ * POST: get list group
+ * params: author = Id user, token
+ */
 router.post('/get', function (req, res) {
     // register using api to maintain clean separation between layers
     request.post({
@@ -81,23 +111,25 @@ router.post('/get', function (req, res) {
         json: true
     }, function (error, response, body) {
         if (error) {
-            return res.status(401).json({'message':'An error occurred' , 'successful' : 'false', 'info' : ''});
-        }
-
-        if (response.statusCode == 200) {
-            return res.status(200).json({'message':'Get your list groups successful' , 'successful' : 'true', 'info' : body.groups});
-        }else if(response.statusCode == 401){
-            res.status(401).json({'message':'Please login before create group' , 'successful' : 'false', 'info' : ''});
-        }else if(response.statusCode == 500){
-            res.status(500).json({'message':"You don't own any group" , 'successful' : 'false', 'info' : ''});
-        }
-        else{
-            // return success message
-            res.status(401).json({'message':"Sorry, no group were found " , 'successful' : 'false', 'info' : ''});
+            // system error
+            res.status(401).json({'message':utils.message("MSG001-CM-I") , 'successful' : 'false', 'info' : ''});
+        }else if (response.statusCode == 200) {
+            // get own groups successful
+            return res.status(200).json({'message':utils.message("MSG005-GP-I") , 'successful' : 'true', 'info' : body.groups});
+        }else if(response.statusCode == 400){
+            // database error, get groups result null
+            res.status(400).json({'message':response.body , 'successful' : 'false', 'info' : ''});
+        }else{
+            // status exception
+            res.status(500).json({'message':utils.message("MSG003-CM-E"), 'successful' : 'false', 'info' : ''});
         }
     });
 });
 
+/**
+ * POST: search group by name (public)
+ * params: name = group name (prefix)
+ */
 router.post('/search', function (req, res) {
     // register using api to maintain clean separation between layers
     request.post({
@@ -106,16 +138,17 @@ router.post('/search', function (req, res) {
         json: true
     }, function (error, response, body) {
         if (error) {
-            return res.status(401).json({'message':'An error occurred' , 'successful' : 'false', 'info' : ''});
-        }
-
-        if (response.statusCode == 200) {
-            return res.status(200).json({'message':'Search groups successful' , 'successful' : 'true', 'info' : body.groups});
-        }else if(response.statusCode == 500){
-            res.status(500).json({'message':"Sorry, no group were found" , 'successful' : 'false', 'info' : ''});
-        }
-        else{
-            res.status(501).json({'message':"Database has trouble" , 'successful' : 'false', 'info' : ''});
+            // system error
+            res.status(401).json({'message':utils.message("MSG001-CM-I") , 'successful' : 'false', 'info' : ''});
+        }else if (response.statusCode == 200) {
+            // search has result
+            return res.status(200).json({'message':utils.message("MSG006-GP-I") , 'successful' : 'true', 'info' : body.groups});
+        }else if(response.statusCode == 400){
+            // database error, result search null
+            res.status(400).json({'message':response.body , 'successful' : 'false', 'info' : ''});
+        }else{
+            // status exception
+            res.status(500).json({'message':utils.message("MSG003-CM-E"), 'successful' : 'false', 'info' : ''});
         }
     });
 });

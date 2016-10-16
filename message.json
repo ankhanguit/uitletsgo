@@ -12,6 +12,35 @@
   "MSG005-ST-E" : "token no match",
   "MSG006-ST-E" : "Validate code failure",
 
+  "MSG001-UR-E" : "Account not found",
+  "MSG002-UR-E" : "Sorry, your code not match",
+  "MSG003-UR-E" : "Password is incorrect",
+  "MSG004-UR-E" : "NewPassword and RePassword not match",
+  "MSG005-UR-E" : "Account do not permit set new password",
+  "MSG001-UR-I" : "Check your code in email",
+  "MSG002-UR-I" : "Update user profile successful",
+  "MSG003-UR-I" : "Ok, now you can change your password",
+  "MSG004-UR-I" : "Ok, your password was changed",
+  "MSG005-UR-I" : "Ok, your password was changed",
+
+  "MSG001-GP-I" : "Your group was created successful",
+  "MSG002-GP-I" : "Search result null",
+  "MSG003-GP-I" : "Your group was updated successful",
+  "MSG004-GP-I" : "You don't own any group",
+  "MSG005-GP-I" : "Get your list groups successful",
+  "MSG006-GP-I" : "Search groups successful",
+  "MSG007-GP-I" : "Your group was deleted successful",
+  "MSG001-GP-E" : "Group not found",
+  "MSG002-GP-E" : "Not your group or group not found",
+
+  "MSG001-MB-I" : "Join group successful, wait for permit",
+  "MSG002-MB-I" : "Leave group successful",
+  "MSG003-MB-I" : "Permit member successful",
+  "MSG004-MB-I" : "Lock member successful",
+  "MSG001-MB-E" : "Member was joined group already",
+
+  "MSG001-TK-E" : "Token not match",
+
   "MSG001-I" : "",
   "MSG002-I" : "",
   "MSG003-I" : ""

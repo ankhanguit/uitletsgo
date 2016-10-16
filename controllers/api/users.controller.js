@@ -23,6 +23,7 @@ var router = express.Router();
 var userService = require('services/user.service');
 var tokenService = require('services/token.service');
 var sendmailLogic = require('logic/sendmail.logic');
+var utils = require('logic/utils.logic');
 
 var jwt = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
@@ -94,7 +95,7 @@ function getCurrentUser(req, res) {
 
 /**
  * PUT: update user profile
- * @param req: firstname, lastname, birthday, gender, address
+ * @param req: firstname, lastname, birthday, gender, address, token , userId
  * @param res
  */
 function updateUser(req, res) {
@@ -104,22 +105,17 @@ function updateUser(req, res) {
     // check token and userId match with database
     tokenService.checkToken(author, token)
         .then(function (subMsg) {
-            if(subMsg && subMsg.success == true){
-                console.log("validate user authenticate success");
+            console.log("validate user authenticate success");
 
-                userService.update(author, req.body)
-                    .then(function () {
-                        res.sendStatus(200);
-                    })
-                    .catch(function (err) {
-                        res.sendStatus(401)
-                    });
-            }else{
-                res.sendStatus(401)
-            }
-
+            userService.update(author, req.body)
+                .then(function () {
+                    res.sendStatus(200);
+                })
+                .catch(function (err) {
+                    res.status(400).send(err);
+                });
         }).catch(function (subErr) {
-        res.sendStatus(401)
+        res.status(400).send(subErr)
     });
 }
 
@@ -134,14 +130,10 @@ function requestChangePassword(req, res){
 
     userService.getById(userId)
         .then(function (user) {
-            if (user) {
-                sendMail(user.EMAIL, user._id, req, res);
-            } else {
-                res.sendStatus(404);
-            }
+            sendMail(user.EMAIL, user._id, req, res);
         })
         .catch(function (err) {
-            res.sendStatus(404);
+            res.status(400).send(err);
         });
 }
 
@@ -153,19 +145,15 @@ function requestChangePassword(req, res){
 function validateDynamicCode(req, res){
     var userId = req.body.id;
     var code = req.body.code;
-    console.log("validate code change password, userid = " + userId + " - code: " + code);
+    console.log("[" + new Date()  + "][users.controller.js][validateDynamicCode] : " +
+        "validate code change password, user id = " + userId + " - code: " + code);
 
     userService.validateDynamicCode(userId , code)
         .then(function (msg) {
-            console.log(msg);
-            if (msg && msg.success == true) {
-                res.sendStatus(200);
-            } else {
-                res.sendStatus(404);
-            }
+            res.sendStatus(200);
         })
         .catch(function (err) {
-            res.sendStatus(404);
+            res.status(400).send(err);
         });
 }
 
@@ -181,15 +169,10 @@ function newPassword(req, res){
 
     userService.newPassword(userId , password)
         .then(function (msg) {
-            console.log(msg);
-            if (msg && msg.success == true) {
-                res.sendStatus(200);
-            } else {
-                res.sendStatus(404);
-            }
+            res.sendStatus(200);
         })
         .catch(function (err) {
-            res.sendStatus(404);
+            res.status(400).send(err);
         });
 }
 
@@ -207,25 +190,18 @@ function updatePassword(req, res){
             if (user && bcrypt.compareSync(password, user.hash)) {
                 userService.updatePassword(userId, newpassword)
                     .then(function (msg) {
-                        console.log(msg);
-                        if (msg && msg.success == true) {
-                            res.sendStatus(200);
-                        } else {
-                            res.sendStatus(404);
-                        }
+                        res.sendStatus(200);
                     })
                     .catch(function (err) {
-                        res.sendStatus(404);
+                        res.status(400).send(err);
                     });
             } else {
-                res.sendStatus(401);
+                res.status(400).send(utils.message("MSG003-UR-E"));
             }
         })
         .catch(function (err) {
-            res.sendStatus(500);
+            res.status(400).send(err);
         });
-
-    console.log("change password, userid = " + userId);
 }
 
 /**
@@ -276,15 +252,10 @@ function sendMail(reciever, userId, req, res){
 
     sendmailLogic.sendmail(reciever, text)
         .then(function (success) {
-            if (success) {
-                updateDynamicCode(userId, code);
-                res.sendStatus(200);
-            }else {
-                res.sendStatus(500);
-            }
+                updateDynamicCode(userId, code, res);
         })
         .catch(function (err) {
-            res.sendStatus(500);
+            res.status(400).send(err);
         });
 }
 
@@ -293,11 +264,12 @@ function sendMail(reciever, userId, req, res){
  * @param userId
  * @param code
  */
-function updateDynamicCode(userId, code){
+function updateDynamicCode(userId, code, res){
     userService.updateDynamicCode(userId, code)
         .then(function (user) {
-
+            res.sendStatus(200);
         })
         .catch(function (err) {
+            res.status(400).send(err);
         });
 }

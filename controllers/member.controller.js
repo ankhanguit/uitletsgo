@@ -1,8 +1,25 @@
+/**
+ * Created by panda94 on 09/12/2016.
+ * Controller member middleware
+ * F- Join: (http://host/member/join) : add member to group
+ * F- Leave: (http://host/member/leave) : member leave group
+ * F- Permit: (http://host/member/permit) : permit member join group
+ * F- Lock: (http://host/member/lock) : lock member
+ *
+ * Update: 10/12/2016.
+ */
+
 var express = require('express');
 var router = express.Router();
 var request = require('request');
 var config = require('config.json');
 
+var utils = require('logic/utils.logic');
+
+/**
+ * POST: join group
+ * params: author = Id member, token, group = Id group
+ */
 router.post('/join', function (req, res) {
     // authenticate using api to maintain clean separation between layers
     request.post({
@@ -12,17 +29,25 @@ router.post('/join', function (req, res) {
     }, function (error, response, body) {
 
         if (error) {
-            res.status(401).json({'message':'An error occurred' , 'successful' : 'false', 'info' : ''});
+            // system error
+            res.status(401).json({'message':utils.message("MSG001-CM-I") , 'successful' : 'false', 'info' : ''});
         }else if( response.statusCode == 200) {
-            res.status(200).json({'message':'Join group successful, wait for permit' , 'successful' : 'true', 'info' : ''});
-        }else if(response.statusCode == 401){
-            res.status(401).json({'message':'Please login before create group' , 'successful' : 'false', 'info' : ''});
-        }else{
+            // join group successful
+            res.status(200).json({'message':utils.message("MSG001-MB-I") , 'successful' : 'true', 'info' : ''});
+        }else if(response.statusCode == 400){
+            // database error, check token error, member exist
             res.status(400).json({'message':response.body , 'successful' : 'false', 'info' : ''});
+        }else{
+            // status exception
+            res.status(500).json({'message':utils.message("MSG003-CM-E"), 'successful' : 'false', 'info' : ''});
         }
     });
 });
 
+/**
+ * DELETE: leave group
+ * params: author = Id member, token, group = Id group
+ */
 router.delete('/leave', function (req, res) {
     // register using api to maintain clean separation between layers
     request.delete({
@@ -31,23 +56,25 @@ router.delete('/leave', function (req, res) {
         json: true
     }, function (error, response, body) {
         if (error) {
-            return res.status(401).json({'message':'An error occurred' , 'successful' : 'false', 'info' : ''});
-        }
-
-        if (response.statusCode == 200) {
-            return res.status(200).json({'message':'Leave group successful' , 'successful' : 'true', 'info' : ''});
-        }else if(response.statusCode == 401){
-            res.status(401).json({'message':'Please login before create group' , 'successful' : 'false', 'info' : ''});
-        }else if(response.statusCode == 500){
-            res.status(500).json({'message':'Your group not found' , 'successful' : 'false', 'info' : ''});
-        }
-        else{
-            // return success message
-            res.status(401).json({'message':"Sorry, you can't leave group right now " , 'successful' : 'false', 'info' : ''});
+            // system error
+            res.status(401).json({'message':utils.message("MSG001-CM-I") , 'successful' : 'false', 'info' : ''});
+        }else if (response.statusCode == 200) {
+            // leave group successful
+            return res.status(200).json({'message':utils.message("MSG002-MB-I") , 'successful' : 'true', 'info' : ''});
+        }else if(response.statusCode == 400){
+            // database error, check token error
+            res.status(400).json({'message':response.body , 'successful' : 'false', 'info' : ''});
+        }else{
+            // status exception
+            res.status(500).json({'message':utils.message("MSG003-CM-E"), 'successful' : 'false', 'info' : ''});
         }
     });
 });
 
+/**
+ * POST: permit member
+ * params: author = Id group own user, token, group = Id group, member = Id member
+ */
 router.post('/permit', function (req, res) {
     // authenticate using api to maintain clean separation between layers
     request.post({
@@ -57,17 +84,25 @@ router.post('/permit', function (req, res) {
     }, function (error, response, body) {
 
         if (error) {
-            res.status(401).json({'message':'An error occurred' , 'successful' : 'false', 'info' : ''});
+            // system error
+            res.status(401).json({'message':utils.message("MSG001-CM-I") , 'successful' : 'false', 'info' : ''});
         }else if( response.statusCode == 200) {
-            res.status(200).json({'message':'Permit member successful' , 'successful' : 'true', 'info' : ''});
-        }else if(response.statusCode == 401){
-            res.status(401).json({'message':'Please login before create group' , 'successful' : 'false', 'info' : ''});
+            // permit member successful
+            res.status(200).json({'message':utils.message("MSG003-MB-I") , 'successful' : 'true', 'info' : ''});
+        }else if(response.statusCode == 400){
+            // database error, check token error
+            res.status(400).json({'message':response.body , 'successful' : 'false', 'info' : ''});
         } else{
-            res.status(400).json({'message':"Sorry, you can't permit this member" , 'successful' : 'false', 'info' : ''});
+            // status exception
+            res.status(500).json({'message':utils.message("MSG003-CM-E"), 'successful' : 'false', 'info' : ''});
         }
     });
 });
 
+/**
+ * POST: lock member
+ * params: author = Id group own user, token, group = Id group, member = Id member
+ */
 router.post('/lock', function (req, res) {
     // authenticate using api to maintain clean separation between layers
     request.post({
@@ -77,13 +112,17 @@ router.post('/lock', function (req, res) {
     }, function (error, response, body) {
 
         if (error) {
-            res.status(401).json({'message':'An error occurred' , 'successful' : 'false', 'info' : ''});
+            // system error
+            res.status(401).json({'message':utils.message("MSG001-CM-I") , 'successful' : 'false', 'info' : ''});
         }else if( response.statusCode == 200) {
-            res.status(200).json({'message':'Lock member successful' , 'successful' : 'true', 'info' : ''});
-        }else if(response.statusCode == 401){
-            res.status(401).json({'message':'Please login before create group' , 'successful' : 'false', 'info' : ''});
+            // lock member successful
+            res.status(200).json({'message':utils.message("MSG004-MB-I") , 'successful' : 'true', 'info' : ''});
+        }else if(response.statusCode == 400){
+            // database error, check token error
+            res.status(400).json({'message':response.body , 'successful' : 'false', 'info' : ''});
         } else{
-            res.status(400).json({'message':"Sorry, you can't lock this member" , 'successful' : 'false', 'info' : ''});
+            // status exception
+            res.status(500).json({'message':utils.message("MSG003-CM-E"), 'successful' : 'false', 'info' : ''});
         }
     });
 });

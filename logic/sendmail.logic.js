@@ -29,8 +29,8 @@ function sendmail(reciever, body) {
 
     transporter.sendMail(mailOptions, function(error, info){
         if(error){
-            console.log(error);
-            deferred.reject("Send mail has error" + error);
+            console.log("[" + new Date()  + "][user.service.js][getById] : " +  error);
+            deferred.reject("Send mail has error");
         }else{
             console.log('Message sent: ' + info.response);
             var msg = {success : true};

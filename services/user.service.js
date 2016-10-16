@@ -1,4 +1,20 @@
-﻿var config = require('config.json');
+﻿/**
+ * Created by panda94 on 09/12/2016.
+ * Service , reference collection users
+ * F- authenticate
+ * F- getById
+ * F- create
+ * F- update
+ * F- validateDynamicCode
+ * F- newPassword
+ * F- _delete
+ * F- updatePassword
+ * F- updateDynamicCode
+ *
+ * Update: 10/12/2016.
+ */
+
+var config = require('config.json');
 var utils = require('logic/utils.logic');
 var _ = require('lodash');
 var jwt = require('jsonwebtoken');
@@ -22,17 +38,27 @@ service.updatePassword = updatePassword;
 
 module.exports = service;
 
+/**
+ * Check user login
+ * @param username
+ * @param password
+ * @returns {*}
+ */
 function authenticate(username, password) {
     var deferred = Q.defer();
 
+    // find user
     db.users.findOne({ USERNAME: username }, function (err, user) {
         if (err){
+            // database error
             deferred.reject(utils.message("MSG002-CM-E"));
-            console.log(err.name + ': ' + err.message);
+            console.log("[" + new Date()  + "][user.service.js][authenticate] : " + err.name + ': ' + err.message);
         }
 
+        // check password
         if (user && bcrypt.compareSync(password, user.hash)) {
             // authentication successful
+            // return user (without hashed password)
             deferred.resolve(_.omit(user, 'hash' ,'STATUS', 'LOCK'));
         } else {
             // authentication failed
@@ -43,46 +69,65 @@ function authenticate(username, password) {
     return deferred.promise;
 }
 
+/**
+ * get user by id
+ * @param _id
+ * @returns {*}
+ */
 function getById(_id) {
     var deferred = Q.defer();
 
+    // find user by id
     db.users.findById(_id, function (err, user) {
-        if (err) deferred.reject(err.name + ': ' + err.message);
+        if (err){
+            // database error
+            deferred.reject(utils.message("MSG002-CM-E"));
+            console.log("[" + new Date()  + "][user.service.js][getById] : " + err.name + ': ' + err.message);
+        }
 
+        // check exist user
         if (user) {
-            // return user (without hashed password)
+            // return user
             deferred.resolve(user);
         } else {
             // user not found
-            deferred.resolve();
+            deferred.reject(utils.message("MSG001-UR-E"));
         }
     });
 
     return deferred.promise;
 }
 
+/**
+ * Create user account
+ * @param userParam
+ * @returns {*}
+ */
 function create(userParam) {
     var deferred = Q.defer();
 
-    // validation
+    // find account exist
     db.users.findOne(
         { USERNAME: userParam.username, EMAIL:userParam.email },
         function (err, user) {
+            // database error
             if (err){
                 deferred.reject(utils.message("MSG002-CM-E"));
-                console.log(err.name + ': ' + err.message);
+                console.log("[" + new Date()  + "][user.service.js][create] : " + err.name + ': ' + err.message);
             }
 
+            // check exist user
             if (user) {
                 // username already exists
                 deferred.reject(utils.message("MSG001-ST-E", userParam.username));
             } else {
+                // create new account
                 createUser();
             }
         });
 
     function createUser() {
-        // set user object to userParam without the cleartext password
+        // set user object to userParam
         var set = {
             USERNAME:userParam.username,
             PASSWORD:userParam.password,
@@ -104,12 +149,14 @@ function create(userParam) {
         // add hashed password to user object
         user.hash = bcrypt.hashSync(userParam.password, 10);
 
+        // insert user to database
         db.users.insert(
             user,
             function (err, doc) {
                 if (err) {
+                    // database error
                     deferred.reject(utils.message("MSG002-CM-E"));
-                    console.log(err.name + ': ' + err.message);
+                    console.log("[" + new Date()  + "][user.service.js][create] : " +err.name + ': ' + err.message);
                 }
 
                 deferred.resolve();
@@ -119,19 +166,29 @@ function create(userParam) {
     return deferred.promise;
 }
 
+/**
+ * Update user profile
+ * @param _id
+ * @param userParam
+ * @returns {*}
+ */
 function update(_id, userParam) {
     var deferred = Q.defer();
 
-    console.log("update user: " +  _id);
-
-    // validation
+    // find exist account
     db.users.findById(_id, function (err, user) {
-        if (err) deferred.reject(err.name + ': ' + err.message);
+        if (err) {
+            // database error
+            deferred.reject(utils.message("MSG002-CM-E"));
+            console.log("[" + new Date()  + "][user.service.js][update] : " + err.name + ': ' + err.message);
+        }
 
+        // check exist user
         if (user) {
+            // update user
             updateUser();
         } else {
-            deferred.reject("Account not found");
+            deferred.reject(utils.message("MSG001-UR-E"));
         }
     });
 
@@ -146,11 +203,16 @@ function update(_id, userParam) {
             UPDATEDATE: new Date()
         };
 
+        // update account to database
         db.users.update(
             { _id: mongo.helper.toObjectID(_id) },
             { $set: set },
             function (err, doc) {
-                if (err) deferred.reject(err.name + ': ' + err.message);
+                if (err) {
+                    // database error
+                    deferred.reject(utils.message("MSG002-CM-E"));
+                    console.log("[" + new Date()  + "][user.service.js][update] : " + err.name + ': ' + err.message);
+                }
 
                 deferred.resolve();
             });
@@ -159,19 +221,30 @@ function update(_id, userParam) {
     return deferred.promise;
 }
 
+/**
+ * Validate code for new password
+ * @param _id
+ * @param code
+ * @returns {*}
+ */
 function validateDynamicCode(_id, code){
     var deferred = Q.defer();
 
-    // validation
+    // find exist account
     db.users.findById(_id, function (err, user) {
-        if (err) deferred.reject(err.name + ': ' + err.message);
+        if (err){
+            // database error
+            deferred.reject(utils.message("MSG002-CM-E"));
+            console.log("[" + new Date()  + "][user.service.js][validateDynamicCode] : " + err.name + ': ' + err.message);
+        }
 
+        // check dynamic code
         if (user && user.DYNAMICCODE == code) {
-            // return user (without hashed password)
+            // update account status
             updateStatus();
         } else {
             // user not found
-            deferred.reject("Validate code failure");
+            deferred.reject(utils.message("MSG002-UR-E"));
         }
     });
 
@@ -181,50 +254,72 @@ function validateDynamicCode(_id, code){
             STATUS: "1"
         };
 
-db.users.update(
-    { _id: mongo.helper.toObjectID(_id) },
-    { $set: set },
-    function (err, doc) {
-        if (err) deferred.reject(err.name + ': ' + err.message);
+        // update account status to database
+        db.users.update(
+        { _id: mongo.helper.toObjectID(_id) },
+        { $set: set },
+        function (err, doc) {
+            if (err){
+                // database error
+                deferred.reject(utils.message("MSG002-CM-E"));
+                console.log("[" + new Date()  + "][user.service.js][validateDynamicCode] : " + err.name + ': ' + err.message);
+            }
 
-        flag = {success: true};
-        deferred.resolve(flag);
-    });
+            flag = {success: true};
+            deferred.resolve(flag);
+        });
+    }
 
+    return deferred.promise;
 }
 
-return deferred.promise;
-}
-
+/**
+ * User set new password with dynamic code, and account status
+ * @param _id
+ * @param password
+ * @returns {*}
+ */
 function newPassword(_id, password){
     var deferred = Q.defer();
 
-    // validation
+    // find exist account
     db.users.findOne({ _id: mongo.helper.toObjectID(_id) , STATUS:"1" }, function (err, user) {
-        if (err) deferred.reject(err.name + ': ' + err.message);
+        if (err){
+            // database error
+            deferred.reject(utils.message("MSG002-CM-E"));
+            console.log("[" + new Date()  + "][user.service.js][newPassword] : " + err.name + ': ' + err.message);
+        }
 
+        // check user exits
         if (user) {
+            // update password
             updateUser();
         } else {
-            deferred.reject("Account not found");
+            deferred.reject(utils.message("MSG005-UR-E"));
         }
     });
 
+    // update user password
     function updateUser() {
+
         // fields to update
         // add hashed password to user object
-
         var set = {
             hash: bcrypt.hashSync(password, 10),
             STATUS: "0",
             DYNAMICCODE: ""
         };
 
+        // update user password to database
         db.users.update(
             { _id: mongo.helper.toObjectID(_id) },
             { $set: set },
             function (err, doc) {
-                if (err) deferred.reject(err.name + ': ' + err.message);
+                if (err){
+                    // database error
+                    deferred.reject(utils.message("MSG002-CM-E"));
+                    console.log("[" + new Date()  + "][user.service.js][newPassword] : " + err.name + ': ' + err.message);
+                }
 
                 flag = {success: true};
                 deferred.resolve(flag);
@@ -234,21 +329,30 @@ function newPassword(_id, password){
     return deferred.promise;
 }
 
+/**
+ * Update user password with current password
+ * @param _id
+ * @param password
+ * @returns {*}
+ */
 function updatePassword(_id, password){
     var deferred = Q.defer();
 
     // fields to update
     // add hashed password to user object
-
     var set = {
         hash: bcrypt.hashSync(password, 10)
     };
 
+    // update password to database
     db.users.update(
         { _id: mongo.helper.toObjectID(_id) },
         { $set: set },
         function (err, doc) {
-            if (err) deferred.reject(err.name + ': ' + err.message);
+            if (err){
+                deferred.reject(utils.message("MSG002-CM-E"));
+                console.log("[" + new Date()  + "][user.service.js][updatePassword] : " + err.name + ': ' + err.message);
+            }
 
             flag = {success: true};
             deferred.resolve(flag);
@@ -258,32 +362,49 @@ function updatePassword(_id, password){
     return deferred.promise;
 }
 
+/**
+ * Register code for set new password
+ * @param _id
+ * @param code
+ * @returns {*}
+ */
 function updateDynamicCode(_id, code) {
     var deferred = Q.defer();
 
+    // set field
     var set = {
         DYNAMICCODE: code
     };
 
+    // update user password to database
     db.users.update(
         { _id: mongo.helper.toObjectID(_id) },
         { $set: set },
         function (err, doc) {
-            if (err) deferred.reject(err.name + ': ' + err.message);
-
+            if (err){
+                // database error
+                deferred.reject(utils.message("MSG002-CM-E"));
+                console.log("[" + new Date()  + "][user.service.js][updateDynamicCode] : " + err.name + ': ' + err.message);
+            }
             deferred.resolve();
         });
-
-
     return deferred.promise;
 }
 
+/**
+ * delete account physical
+ * @param _id
+ * @returns {*}
+ * @private
+ */
 function _delete(_id) {
     var deferred = Q.defer();
 
+    // remove account from database
     db.users.remove(
         { _id: mongo.helper.toObjectID(_id) },
         function (err) {
+            // database error
             if (err) deferred.reject(err.name + ': ' + err.message);
 
             deferred.resolve();
