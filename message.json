@@ -38,6 +38,7 @@
   "MSG003-MB-I" : "Permit member successful",
   "MSG004-MB-I" : "Lock member successful",
   "MSG001-MB-E" : "Member was joined group already",
+  "MSG002-MB-E" : "Member not exist",
 
   "MSG001-TK-E" : "Token not match",
 

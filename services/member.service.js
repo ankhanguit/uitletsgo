@@ -5,6 +5,7 @@
  * F- leaveGroup
  * F- permitMember
  * F- lockMember
+ * F- findMember
  *
  * Update: 10/12/2016.
  */
@@ -23,6 +24,7 @@ service.join = joinGroup;
 service.leave = leaveGroup;
 service.permit = permitMember;
 service.lock = lockMember;
+service.findMember = findMember;
 
 module.exports = service;
 
@@ -167,4 +169,34 @@ function lockMember(member_Id, groupId) {
             deferred.resolve(msg);
         });
     return deferred.promise;
+}
+
+/**
+ * Find member by id from groupId
+ * @param memberId
+ * @param groupId
+ */
+function findMember(memberId, groupId){
+    var deferred = Q.defer();
+
+    // validation
+    var groupDb = db.collection("group_member_" + groupId);
+
+    // find member exist
+    groupDb.findOne(
+        { MEMBER_ID: memberId},
+        function (err, member) {
+            if (err){
+                // database error
+                deferred.reject(utils.message("MSG002-CM-E"));
+                console.log("[" + new Date()  + "][group.service.js][joinGroup] : " + err.name + ': ' + err.message);
+            }
+
+            if (member) {
+                // member exists
+                deferred.resolve({member : member});
+            } else {
+                deferred.reject(utils.message("MSG002-MB-E"));
+            }
+        });
 }
