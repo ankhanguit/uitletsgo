@@ -16,11 +16,11 @@ var Q = require('q');
 var mongo = require('mongoskin');
 var utils = require('logic/utils.logic');
 var db = mongo.db(process.env.MONGODB_URI, { native_parser: true });
-db.bind('members');
+db.bind('message');
 
 var service = {};
 
-service.join = joinGroup;
+service.addGroupMessage = addGroupMessage;
 service.leave = leaveGroup;
 service.permit = permitMember;
 service.lock = lockMember;
@@ -34,46 +34,27 @@ module.exports = service;
  * @param groupId
  * @returns {*}
  */
-function joinGroup(author, groupId) {
+function addGroupMessage(author, groupId, message) {
     var deferred = Q.defer();
 
-    var objInsert = {'MEMBER_ID': mongo.helper.toObjectID(author), 'JOIN_DATE' : new Date(), 'PERMIT' : 0 , 'ROLE' : 7};
+    var objInsert = {'MEMBER_ID': mongo.helper.toObjectID(author), 'CREATE_DATE' : new Date(), 'MESSAGE' : message};
     // validation
-    var groupDb = db.collection("group_member_" + groupId);
+    var messageDb = db.collection("group_message_" + groupId);
 
-    // find member exist
-    groupDb.findOne(
-        { MEMBER_ID: mongo.helper.toObjectID(author)},
-        function (err, member) {
+
+    messageDb.insert(
+        objInsert,
+        function (err, doc) {
             if (err){
                 // database error
                 deferred.reject(utils.message("MSG002-CM-E"));
                 console.log("[" + new Date()  + "][group.service.js][joinGroup] : " + err.name + ': ' + err.message);
             }
 
-            if (member) {
-                // member already exists
-                deferred.reject(utils.message("MSG001-MB-E"));
-            } else {
-                insertMember();
-            }
+            var msg = {success: true};
+            deferred.resolve(msg);
         });
 
-    // insert member
-    function insertMember(){
-        groupDb.insert(
-            objInsert,
-            function (err, doc) {
-                if (err){
-                    // database error
-                    deferred.reject(utils.message("MSG002-CM-E"));
-                    console.log("[" + new Date()  + "][group.service.js][joinGroup] : " + err.name + ': ' + err.message);
-                }
-
-                var msg = {success: true};
-                deferred.resolve(msg);
-            });
-    }
     return deferred.promise;
 }
 
