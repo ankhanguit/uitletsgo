@@ -46,6 +46,30 @@ module.exports = function(app,io) {
 									// broadcast message
 									chat.in(data.groupId).emit('mConnect', dataRes);
 
+									groupMessageService.getNewestMessage(groupId)
+											.then(function (message) {
+
+												// create data set for newest message
+												var msgRes = {
+													message: "10 newest message",
+													success: "true",
+													flag: "newest-message",
+													data: message
+												};
+
+												socket.emit('mMessage',msgRes);
+
+											}).catch(function (subErr) {
+												var msgRes = {
+													message: "get false 10 newest message",
+													success: "false",
+													flag: "newest-message",
+													data: ""
+												};
+
+												socket.emit('mMessage',msgRes);
+										});
+
 								}).catch(function (subErr) {
 							// create data set for response
 							var dataRes = {message:subErr , success: "false", flag: "login", data:""};
