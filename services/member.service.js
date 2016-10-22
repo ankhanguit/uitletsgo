@@ -90,7 +90,7 @@ function leaveGroup(member_id, groupId) {
 
     // remove member from database
     groupDb.remove(
-        {MEMBER_ID: member_id},
+        {MEMBER_ID: mongo.helper.toObjectID(member_id)},
         function (err) {
             if (err){
                 // database error
@@ -123,7 +123,7 @@ function permitMember(member_Id, groupId) {
 
     // update group member status
     groupDb.update(
-        { MEMBER_ID: member_Id },
+        { MEMBER_ID: mongo.helper.toObjectID(member_Id) },
         { $set: set },
         function (err, doc) {
             if (err){
@@ -156,7 +156,7 @@ function lockMember(member_Id, groupId) {
 
     // update group member status
     groupDb.update(
-        { MEMBER_ID: member_Id },
+        { MEMBER_ID: mongo.helper.toObjectID(member_Id) },
         { $set: set },
         function (err, doc) {
             if (err){
@@ -187,7 +187,7 @@ function findMember(memberId, groupId){
             { $match: {'MEMBER_ID': mongo.helper.toObjectID(memberId)}},
             { $lookup: { from: "users", localField: "MEMBER_ID", foreignField: "_id", as: "AUTHOR_INFO"}},
             { $unwind : "$AUTHOR_INFO"},
-            { $project: { MEMBER_ID : 1, GROUP_ID : 1, FIRSTNAME : "$AUTHOR_INFO.FIRSTNAME" ,LASTNAME : "$AUTHOR_INFO.LASTNAME" , CODE: 1}}
+            { $project: { MEMBER_ID : 1, GROUP_ID : 1, FIRSTNAME : "$AUTHOR_INFO.FIRSTNAME" ,LASTNAME : "$AUTHOR_INFO.LASTNAME"}}
         ],
         function (err, member) {
             if (err){

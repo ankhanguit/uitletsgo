@@ -4,7 +4,6 @@ var groupMessageService = require('services/message.service');
 
 module.exports = function(app,io) {
 	var chat = io.on('connection', function (socket) {
-		var address = socket.handshake.address;
 
 		socket.on('mConnect', function(data) {
 
@@ -49,7 +48,7 @@ module.exports = function(app,io) {
 
 								}).catch(function (subErr) {
 							// create data set for response
-							var dataRes = {message:subErr , success: "false", flag: "fdsf", data:""};
+							var dataRes = {message:subErr , success: "false", flag: "login", data:""};
 
 							// login fail, send fail login message
 							socket.emit('mConnect',dataRes);
@@ -71,17 +70,29 @@ module.exports = function(app,io) {
 
 			groupMessageService.addGroupMessage(userId, groupId, message)
 					.then(function (member) {
-
+						chat.in(socket.room).emit('mMessage', {
+							message: "Send broadcast message successful",
+							success: "true",
+							flag: "new-message",
+							data: {
+								message: data.message,
+								username: socket.username,
+								firstname: socket.firstname,
+								lastname: socket.lastname
+							}
+						});
 					}).catch(function (subErr) {
 
+					socket.emit('mMessage', {
+						message: "Can't save this message",
+						success: "false",
+						flag: "save-false",
+						data: ""
+					});
+
 			});
 
-			chat.in(socket.room).emit('mMessage', {
-				message: data.message,
-				username: socket.username,
-				firstname: socket.firstname,
-				lastname: socket.lastname
-			});
+
 		});
 	});
 };
