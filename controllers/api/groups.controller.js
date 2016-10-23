@@ -7,8 +7,12 @@
  * F- UpdateGroup: (http://host/groups/update) , middleware: (http://host/group/update) : update group profile
  * F- GetList: (http://host/api/groups/get), middleware: (http://host/group/get) : get list group created by user
  * F- Search: (http://host/api/groups/search), middleware: (http://host/group/search) : search all group by name
+ * F- UpdateSchedule: (http://host/groups/updateSchedule) , middleware: (http://host/group/updateSchedule) : update group schedule
+ * F- UpdatePreparation: (http://host/groups/updatePreparation) , middleware: (http://host/group/updatePreparation) : update group preparation
+ * F- getSchedule: (http://host/groups/getSchedule) , middleware: (http://host/group/getSchedule) : get group schedule
+ * F- getPreparation: (http://host/groups/getPreparation) , middleware: (http://host/group/getPreparation) : get group preparation
  *
- * Update: 10/12/2016.
+ * Update: 10/23/2016.
  */
 
 var config = require('config.json');
@@ -24,6 +28,10 @@ var tokenService = require('services/token.service');
 router.post('/add', createGroup);
 router.delete('/delete', deleteGroup);
 router.put('/update', updateGroup);
+router.put('/updateSchedule', updateGroupSchedule);
+router.put('/updatePreparation', updateGroupPreparation);
+router.post('/getSchedule', getGroupSchedule);
+router.post('/getPreparation', getGroupPreparation);
 router.post('/get', getList);
 router.post('/search', search);
 
@@ -31,7 +39,7 @@ module.exports = router;
 
 /**
  * Create group
- * @param req: author = Id user, token, decription = group decription, name = group name
+ * @param req: author = Id user, token, description = group description, name = group name
  * @param res
  */
 function createGroup(req, res) {
@@ -93,7 +101,7 @@ function deleteGroup(req, res) {
 
 /**
  * Update group profile
- * @param req: author = Id user, token, id = Id group, name = group name, decription
+ * @param req: author = Id user, token, id = Id group, name = group name, description
  * @param res
  */
 function updateGroup(req, res){
@@ -163,6 +171,129 @@ function getList(req, res){
         groupService.get(author)
             .then(function (groups) {
                 res.status(200).send({groups: groups});
+            })
+            .catch(function (err) {
+                res.status(400).send(err);
+            });
+    }
+}
+
+/**
+ * Update group schedule
+ * @param req: author = Id user, token, id = Id group, schedule
+ * @param res
+ */
+function updateGroupSchedule(req, res){
+
+    var author = req.body.author;
+    var token = req.body.token;
+    var groupId = req.body.id;
+
+    // check token
+    tokenService.checkToken(author, token)
+        .then(function (subMsg) {
+            groupUpdateSchedule();
+        }).catch(function (subErr) {
+        res.status(400).send(subErr);
+    });
+
+    // update group schedule
+    function groupUpdateSchedule(){
+        groupService.updateSchedule(groupId, req.body)
+            .then(function (msg) {
+                res.sendStatus(200);
+            })
+            .catch(function (err) {
+                res.status(400).send(err);
+            });
+    }
+}
+
+/**
+ * Update group schedule
+ * @param req: author = Id user, token, id = Id group, preparation
+ * @param res
+ */
+function updateGroupPreparation(req, res){
+
+    var author = req.body.author;
+    var token = req.body.token;
+    var groupId = req.body.id;
+
+    // check token
+    tokenService.checkToken(author, token)
+        .then(function (subMsg) {
+            groupUpdateSchedule();
+        }).catch(function (subErr) {
+        res.status(400).send(subErr);
+    });
+
+    // update group preparation
+    function groupUpdateSchedule(){
+        groupService.updatePreparation(groupId, req.body)
+            .then(function (msg) {
+                res.sendStatus(200);
+            })
+            .catch(function (err) {
+                res.status(400).send(err);
+            });
+    }
+}
+/**
+ * Get group preparation
+ * @param req: author = Id user, token, id = Id group
+ * @param res
+ */
+function getGroupPreparation(req, res){
+
+    var author = req.body.author;
+    var token = req.body.token;
+    var groupId = req.body.id;
+
+    // check token
+    tokenService.checkToken(author, token)
+        .then(function (subMsg) {
+            getPreparation();
+        }).catch(function (subErr) {
+        res.status(400).send(subErr);
+    });
+
+    // get group preparation
+    function getPreparation(){
+        groupService.getPreparation(author, groupId)
+            .then(function (preparation) {
+                res.status(200).send({preparation: preparation});
+            })
+            .catch(function (err) {
+                res.status(400).send(err);
+            });
+    }
+}
+
+/**
+ * Get group schedule
+ * @param req: author = Id user, token, id = Id group
+ * @param res
+ */
+function getGroupSchedule(req, res){
+
+    var author = req.body.author;
+    var token = req.body.token;
+    var groupId = req.body.id;
+
+    // check token
+    tokenService.checkToken(author, token)
+        .then(function (subMsg) {
+            getSchedule();
+        }).catch(function (subErr) {
+        res.status(400).send(subErr);
+    });
+
+    // get group schedule
+    function getSchedule(){
+        groupService.getSchedule(author, groupId)
+            .then(function (schedule) {
+                res.status(200).send({schedule: schedule});
             })
             .catch(function (err) {
                 res.status(400).send(err);

@@ -30,6 +30,10 @@
   "MSG005-GP-I" : "Get your list groups successful",
   "MSG006-GP-I" : "Search groups successful",
   "MSG007-GP-I" : "Your group was deleted successful",
+  "MSG008-GP-I" : "Group schedule update successful",
+  "MSG009-GP-I" : "Group preparation update successful",
+  "MSG010-GP-I" : "Get group schedule successful",
+  "MSG011-GP-I" : "Get group preparation successful",
   "MSG001-GP-E" : "Group not found",
   "MSG002-GP-E" : "Not your group or group not found",
 
@@ -39,6 +43,7 @@
   "MSG004-MB-I" : "Lock member successful",
   "MSG001-MB-E" : "Member was joined group already",
   "MSG002-MB-E" : "Member not exist",
+  "MSG003-MB-E" : "Group authentication failure",
 
   "MSG001-TK-E" : "Token not match",
 

@@ -6,8 +6,9 @@
  * F- permitMember
  * F- lockMember
  * F- findMember
+ * F- findOne
  *
- * Update: 10/12/2016.
+ * Update: 10/23/2016.
  */
 
 var config = require('config.json');
@@ -25,6 +26,7 @@ service.leave = leaveGroup;
 service.permit = permitMember;
 service.lock = lockMember;
 service.findMember = findMember;
+service.findOne = findOne;
 
 module.exports = service;
 
@@ -202,6 +204,40 @@ function findMember(memberId, groupId){
             } else {
                 deferred.reject(utils.message("MSG002-MB-E"));
             }
+        });
+
+    return deferred.promise;
+}
+
+/**
+ * Member find one
+ * @param memberId
+ * @param groupId
+ * @returns {*}
+ */
+function findOne(memberId, groupId){
+    var deferred = Q.defer();
+
+    // validation
+    var groupDb = db.collection("group_member_" + groupId);
+
+    // find member exist
+    groupDb.findOne(
+        { MEMBER_ID: mongo.helper.toObjectID(memberId)},
+        function (err, member) {
+            if (err){
+                // database error
+                deferred.reject(utils.message("MSG002-CM-E"));
+                console.log("[" + new Date()  + "][group.service.js][joinGroup] : " + err.name + ': ' + err.message);
+            }
+
+            // member exists
+            if(member) {
+                deferred.resolve(member);
+            }else{
+                deferred.reject(utils.message("MSG003-MB-E"));
+            }
+
         });
 
     return deferred.promise;

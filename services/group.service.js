@@ -7,6 +7,10 @@
  * F- update
  * F- getList
  * F- _delete
+ * F- updateSchedule
+ * F- updatePreparation
+ * F- getSchedule
+ * F- getPreparation
  *
  * Update: 10/12/2016.
  */
@@ -21,12 +25,17 @@ var utils = require('logic/utils.logic');
 var db = mongo.db(process.env.MONGODB_URI, { native_parser: true });
 db.bind('groups');
 
+var memberService = require('services/member.service');
 var service = {};
 
 service.getById = getById;
 service.getByName = findByName;
+service.getSchedule = getSchedule;
+service.getPreparation = getPreparation;
 service.create = create;
 service.update = update;
+service.updateSchedule = updateSchedule;
+service.updatePreparation = updatePreparation;
 service.get = getList;
 service.delete = _delete;
 
@@ -42,7 +51,11 @@ function getById(_id) {
 
     // find group by id
     db.groups.findById(_id, function (err, group) {
-        if (err) deferred.reject(err.name + ': ' + err.message);
+        if (err){
+            // database error
+            deferred.reject(utils.message("MSG002-CM-E"));
+            console.log("[" + new Date()  + "][user.group.js][getById] : " + err.name + ': ' + err.message);
+        }
 
         if (group) {
             // return user (without hashed password)
@@ -70,12 +83,16 @@ function create(groupParam) {
     var set = {
         AUTHOR:mongo.helper.toObjectID(groupParam.author),
         NAME:groupParam.name,
-        DECRIPTION:groupParam.decription,
+        DESCRIPTION:groupParam.description,
+        SCHEDULE: "",
+        PREPARE: "",
         CODE: groupCode,
         STATUS: "0",
         LOCK: "0",
         CREATEDATE: new Date(),
-        UPDATEDATE: new Date()
+        UPDATEDATE: new Date(),
+        UPDATE_PREPARATION_DATE: new Date(),
+        UPDATE_SCHEDULE_DATE: new Date()
     };
 
     // insert group profile to database
@@ -109,7 +126,7 @@ function update(_id, groupParam) {
     // set update file to group object
     var set = {
         NAME: groupParam.name,
-        DECRIPTION: groupParam.decription,
+        DESCRIPTION: groupParam.description,
         UPDATEDATE: new Date()
     };
 
@@ -122,7 +139,7 @@ function update(_id, groupParam) {
         }
 
         // check group exist
-        if (group && group.AUTHOR == mongo.helper.toObjectID(author)) {
+        if (group && group.AUTHOR == author) {
             // update group
             groupUpdate();
         } else {
@@ -171,7 +188,7 @@ function _delete(_id, author) {
         }
 
         // check exist group and match author = user id
-        if (group && group.AUTHOR == mongo.helper.toObjectID(author)) {
+        if (group && group.AUTHOR == author) {
             // remove group
             groupRemove();
         } else {
@@ -260,6 +277,182 @@ function findByName(groupName){
             // result null
             deferred.reject(utils.message("MSG002-GP-I"));
         }
+    });
+    return deferred.promise;
+}
+
+
+/**
+ * Update schedule
+ * @param _id
+ * @param groupParam
+ * @returns {*|promise}
+ */
+function updateSchedule(_id, groupParam) {
+    var deferred = Q.defer();
+    var author = groupParam.author;
+
+    // set update file to group object
+    var set = {
+        SCHEDULE: groupParam.schedule,
+        UPDATE_SCHEDULE_DATE: new Date()
+    };
+
+    // find group exist
+    db.groups.findById(_id, function (err, group) {
+        if (err){
+            // database error
+            deferred.reject(utils.message("MSG002-CM-E"));
+            console.log("[" + new Date()  + "][user.group.js][update] : " + err.name + ': ' + err.message);
+        }
+
+        // check group exist
+        if (group && group.AUTHOR == author) {
+            // update group
+            groupUpdate();
+        } else {
+            // group not found
+            deferred.reject(utils.message("MSG001-GP-E"));
+        }
+    });
+
+    // update group profile
+    function groupUpdate(){
+        db.groups.update(
+            { _id: mongo.helper.toObjectID(_id) },
+            { $set: set },
+            function (err, doc) {
+                if (err){
+                    // database error
+                    deferred.reject(utils.message("MSG002-CM-E"));
+                    console.log("[" + new Date()  + "][user.group.js][update] : " + err.name + ': ' + err.message);
+                }
+
+                var msg = {success: true};
+                deferred.resolve(msg);
+            });
+    }
+
+
+    return deferred.promise;
+}
+
+/**
+ * update Preparation
+ * @param _id
+ * @param groupParam
+ * @returns {*|promise}
+ */
+function updatePreparation(_id, groupParam) {
+    var deferred = Q.defer();
+    var author = groupParam.author;
+
+    // set update file to group object
+    var set = {
+        PREPARATION: groupParam.preparation,
+        UPDATE_PREPARATION_DATE: new Date()
+    };
+
+    // find group exist
+    db.groups.findById(_id, function (err, group) {
+        if (err){
+            // database error
+            deferred.reject(utils.message("MSG002-CM-E"));
+            console.log("[" + new Date()  + "][user.group.js][update] : " + err.name + ': ' + err.message);
+        }
+
+        // check group exist
+        if (group && group.AUTHOR == author) {
+            // update group
+            groupUpdate();
+        } else {
+            // group not found
+            deferred.reject(utils.message("MSG001-GP-E"));
+        }
+    });
+
+    // update group profile
+    function groupUpdate(){
+        db.groups.update(
+            { _id: mongo.helper.toObjectID(_id) },
+            { $set: set },
+            function (err, doc) {
+                if (err){
+                    // database error
+                    deferred.reject(utils.message("MSG002-CM-E"));
+                    console.log("[" + new Date()  + "][user.group.js][update] : " + err.name + ': ' + err.message);
+                }
+
+                var msg = {success: true};
+                deferred.resolve(msg);
+            });
+    }
+    return deferred.promise;
+}
+
+/**
+ * get group Schedule
+ * @param member_id
+ * @param _id
+ * @returns {*}
+ */
+function getSchedule(member_id, _id){
+    var deferred = Q.defer();
+
+    memberService.findOne(member_id, _id)
+        .then(function (subMsg) {
+            // find group by id
+            db.groups.findById(_id, function (err, group) {
+                if (err){
+                    // database error
+                    deferred.reject(utils.message("MSG002-CM-E"));
+                    console.log("[" + new Date()  + "][user.group.js][getGroupSchedule] : " + err.name + ': ' + err.message);
+                }
+
+                if (group) {
+                    // return schedule
+                    deferred.resolve({SCHEDULE: group.SCHEDULE , UPDATE_SCHEDULE_DATE: group.UPDATE_SCHEDULE_DATE});
+                } else {
+                    // user not found
+                    deferred.reject(utils.message("MSG001-GP-E"));
+                }
+            });
+        }).catch(function (subErr) {
+        deferred.reject(subErr);
+    });
+
+    return deferred.promise;
+}
+
+/**
+ * get group Preparation
+ * @param member_id
+ * @param _id
+ * @returns {*}
+ */
+function getPreparation(member_id, _id){
+    var deferred = Q.defer();
+
+    memberService.findOne(member_id, _id)
+        .then(function (subMsg) {
+            // find group by id
+            db.groups.findById(_id, function (err, group) {
+                if (err){
+                    // database error
+                    deferred.reject(utils.message("MSG002-CM-E"));
+                    console.log("[" + new Date()  + "][user.group.js][getGroupSchedule] : " + err.name + ': ' + err.message);
+                }
+
+                if (group) {
+                    // return preparation
+                    deferred.resolve({PREPARATION: group.PREPARATION , UPDATE_PREPARATION_DATE: group.UPDATE_PREPARATION_DATE});
+                } else {
+                    // user not found
+                    deferred.reject(utils.message("MSG001-GP-E"));
+                }
+            });
+        }).catch(function (subErr) {
+        deferred.reject(subErr);
     });
 
     return deferred.promise;
