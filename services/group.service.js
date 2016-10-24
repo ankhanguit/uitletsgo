@@ -105,7 +105,7 @@ function create(groupParam) {
                 console.log("[" + new Date()  + "][user.group.js][create] : " + err.name + ': ' + err.message);
             }
 
-            memberService.join(groupParam.author, doc._id)
+            memberService.join(groupParam.author, doc.ops[0]._id)
                 .then(function (subMsg) {
 
                     // return group profile without STATUS, LOCK
