@@ -105,9 +105,16 @@ function create(groupParam) {
                 console.log("[" + new Date()  + "][user.group.js][create] : " + err.name + ': ' + err.message);
             }
 
-            // return group profile without STATUS, LOCK
-            var group = _.omit(doc.ops[0], 'STATUS', 'LOCK');
-            deferred.resolve({group: group});
+            memberService.join(groupParam.author, doc._id)
+                .then(function (subMsg) {
+
+                    // return group profile without STATUS, LOCK
+                    var group = _.omit(doc.ops[0], 'STATUS', 'LOCK');
+                    deferred.resolve({group: group});
+
+                }).catch(function (subErr) {
+                deferred.reject(subErr);
+            });
         });
 
     return deferred.promise;

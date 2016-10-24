@@ -29,7 +29,7 @@ function sendmail(reciever, body) {
 
     transporter.sendMail(mailOptions, function(error, info){
         if(error){
-            console.log("[" + new Date()  + "][user.service.js][getById] : " +  error);
+            console.log("[" + new Date()  + "][sendmail.logic][sendmail] : " +  error);
             deferred.reject("Send mail has error");
         }else{
             console.log('Message sent: ' + info.response);
