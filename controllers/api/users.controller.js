@@ -258,29 +258,20 @@ function uploadAvatar(req, res) {
 
 /**
  * POST: get user avatar
- * @param req:  userId, token
+ * @param req:  userId
  * @param res
  */
 function getAvatar(req, res) {
     var author = req.body.author;
     var token = req.body.token;
 
-
-    // check token and userId match with database
-    tokenService.checkToken(author, token)
-        .then(function (subMsg) {
-            console.log("validate user authenticate success");
-
-            avatarService.get(author)
-                .then(function (avatar) {
-                    res.status(200).send({avatar: avatar});
-                })
-                .catch(function (err) {
-                    res.status(400).send(err);
-                });
-        }).catch(function (subErr) {
-        res.status(400).send(subErr)
-    });
+    avatarService.get(author)
+        .then(function (avatar) {
+            res.status(200).send({avatar: avatar});
+        })
+        .catch(function (err) {
+            res.status(400).send(err);
+        });
 }
 
 /**

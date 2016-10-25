@@ -225,7 +225,7 @@ router.post('/uploadAvatar', function (req, res) {
 
 /**
  * POST: user get avatar
- * params: userId, token
+ * params: userId
  */
 router.post('/getAvatar', function (req, res) {
     // authenticate using api to maintain clean separation between layers
