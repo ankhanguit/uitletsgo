@@ -7,6 +7,8 @@
  * F- ValidateDynamicCode: (http://host/user/validateDynamicCode) : user check change password code
  * F- NewPassword (http://host/user/newpassword) : user register new password (forgot password)
  * F- UpdatePassword (http://host/user/updatepassword) : user update password
+ * F- UploadAvatar (http://host/user/uploadAvatar) : user upload avatar
+ * F- GetAvatar (http://host/user/getAvatar) : user get avatar
  *
  * Update: 15/12/2016.
  */
@@ -191,6 +193,62 @@ router.put('/updatePassword', function (req, res) {
         // form validate error
         res.status(501).json({'message':utils.message("MSG004-UR-E"), 'successful': 'false', 'info': ''});
     }
+});
+
+/**
+ * POST: user upload image for avatar
+ * params: userId, token, avatar
+ */
+router.post('/uploadAvatar', function (req, res) {
+    // authenticate using api to maintain clean separation between layers
+    request.post({
+        url: config.apiUrl + '/users/uploadAvatar',
+        form: req.body,
+        json: true
+    }, function (error, response, body) {
+        if (error) {
+            // system error
+            res.status(401).json({'message':utils.message("MSG001-CM-I") , 'successful' : 'false', 'info' : ''});
+        }else if(response.statusCode == 200){
+            // upload avatar successful
+            res.status(200).json({'message':utils.message("MSG006-UR-I"), 'successful': 'true', 'info': ''});
+        }else if(response.statusCode == 400){
+            // database error, find user error
+            res.status(400).json({'message':response.body, 'successful': 'false', 'info': ''});
+        }else{
+            // status exception
+            res.status(500).json({'message':utils.message("MSG003-CM-E"), 'successful' : 'false', 'info' : ''});
+        }
+
+    });
+});
+
+/**
+ * POST: user get avatar
+ * params: userId, token
+ */
+router.post('/getAvatar', function (req, res) {
+    // authenticate using api to maintain clean separation between layers
+    request.post({
+        url: config.apiUrl + '/users/getAvatar',
+        form: req.body,
+        json: true
+    }, function (error, response, body) {
+        if (error) {
+            // system error
+            res.status(401).json({'message':utils.message("MSG001-CM-I") , 'successful' : 'false', 'info' : ''});
+        }else if(response.statusCode == 200){
+            // get avatar successful
+            res.status(200).json({'message':utils.message("MSG007-UR-I"), 'successful': 'true', 'info': body.avatar});
+        }else if(response.statusCode == 400){
+            // database error, find user error
+            res.status(400).json({'message':response.body, 'successful': 'false', 'info': ''});
+        }else{
+            // status exception
+            res.status(500).json({'message':utils.message("MSG003-CM-E"), 'successful' : 'false', 'info' : ''});
+        }
+
+    });
 });
 
 module.exports = router;

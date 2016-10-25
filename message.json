@@ -17,11 +17,14 @@
   "MSG003-UR-E" : "Password is incorrect",
   "MSG004-UR-E" : "NewPassword and RePassword not match",
   "MSG005-UR-E" : "Account do not permit set new password",
+  "MSG006-UR-E" : "Avatar not found",
   "MSG001-UR-I" : "Check your code in email",
   "MSG002-UR-I" : "Update user profile successful",
   "MSG003-UR-I" : "Ok, now you can change your password",
   "MSG004-UR-I" : "Ok, your password was changed",
   "MSG005-UR-I" : "Ok, your password was changed",
+  "MSG006-UR-I" : "Ok, upload your avatar successful",
+  "MSG007-UR-I" : "Ok, get your avatar successful",
 
   "MSG001-GP-I" : "Your group was created successful",
   "MSG002-GP-I" : "Search result null",
@@ -42,13 +45,13 @@
   "MSG003-MB-I" : "Permit member successful",
   "MSG004-MB-I" : "Lock member successful",
   "MSG005-MB-I" : "You are not under any group",
-  "MSG006-MB-I" : "Get a list of organizations you under successful",
+  "MSG006-MB-I" : "Get a list of groups you under successful",
   "MSG007-MB-I" : "Get result null",
   "MSG001-MB-E" : "Member was joined group already",
   "MSG002-MB-E" : "Member not exist",
 
 
-  "MSG001-TK-E" : "Token not match",
+  "MSG001-TK-E" : "Account not authenticated",
 
   "MSG001-I" : "",
   "MSG002-I" : "",

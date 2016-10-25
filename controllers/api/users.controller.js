@@ -12,6 +12,9 @@
  *      middleware: (http://host/user/validateDynamicCode) : validate code new password
  * F- NewPassword: (http://host/api/users/newPassword), middleware: (http://host/user/newPassword) : new password (forgot case)
  * F- UpdatePassword (http://host/api/users/updatePassword), middleware: (http://host/user/updatePassword) : update password
+ * F- UploadAvatar (http://host/api/users/uploadAvatar), middleware: (http://host/user/uploadAvatar) : save or update user avatar
+ * F- GetAvatar (http://host/api/users/getAvatar), middleware: (http://host/user/getAvatar) : get user avatar
+ *
  *
  * Update: 10/12/2016.
  */
@@ -21,6 +24,7 @@ var express = require('express');
 var router = express.Router();
 
 var userService = require('services/user.service');
+var avatarService = require('services/avatar.service');
 var tokenService = require('services/token.service');
 var sendmailLogic = require('logic/sendmail.logic');
 var utils = require('logic/utils.logic');
@@ -31,6 +35,8 @@ var bcrypt = require('bcryptjs');
 // routes
 router.post('/authenticate', authenticateUser);
 router.post('/register', registerUser);
+router.post('/getAvatar', getAvatar);
+router.post('/uploadAvatar', uploadAvatar);
 router.post('/requestChangePassword' , requestChangePassword);
 router.post('/validateDynamicCode' , validateDynamicCode);
 router.put('/newPassword' , newPassword);
@@ -223,6 +229,58 @@ function deleteUser(req, res) {
         .catch(function (err) {
             res.status(400).send(err);
         });
+}
+
+/**
+ * POST: save or update user avatar
+ * @param req:  userId, token, avatar
+ * @param res
+ */
+function uploadAvatar(req, res) {
+    var author = req.body.author;
+    var token = req.body.token;
+
+
+    // check token and userId match with database
+    tokenService.checkToken(author, token)
+        .then(function (subMsg) {
+            avatarService.save(author, req.body.avatar)
+                .then(function () {
+                    res.sendStatus(200);
+                })
+                .catch(function (err) {
+                    res.status(400).send(err);
+                });
+        }).catch(function (subErr) {
+        res.status(400).send(subErr)
+    });
+}
+
+/**
+ * POST: get user avatar
+ * @param req:  userId, token
+ * @param res
+ */
+function getAvatar(req, res) {
+    var author = req.body.author;
+    var token = req.body.token;
+
+
+    // check token and userId match with database
+    tokenService.checkToken(author, token)
+        .then(function (subMsg) {
+            console.log("validate user authenticate success");
+
+            avatarService.get(author)
+                .then(function (avatar) {
+                    res.status(200).send({avatar: avatar});
+                })
+                .catch(function (err) {
+                    res.status(400).send(err);
+                });
+        }).catch(function (subErr) {
+        res.status(400).send(subErr)
+    });
 }
 
 /**
