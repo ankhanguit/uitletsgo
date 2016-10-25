@@ -32,7 +32,8 @@ app.use('/api', expressJwt({ secret: config.secret }).unless({ path: [
     '/api/members/leave',
     '/api/members/permit',
     '/api/members/lock',
-    '/api/members/join'
+    '/api/members/join',
+    '/api/members/getGroup'
 
 ] }));
 

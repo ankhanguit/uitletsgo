@@ -6,6 +6,7 @@
  * F- LeaveGroup: (http://host/api/members/leave), middleware: (http://host/member/leave) : member leave group
  * F- PermitMember: (http://host/members/permit) , middleware: (http://host/member/permit) : permit member join group
  * F- LockMember: (http://host/api/members/lock), middleware: (http://host/member/lock) : lock member from group own
+ * F- getGroup: (http://host/api/members/getGroup), middleware: (http://host/member/getGroup) : get list affiliated  groups
  *
  * Update: 10/12/2016.
  */
@@ -23,6 +24,7 @@ router.post('/join', joinGroup);
 router.delete('/leave', leaveGroup);
 router.post('/permit', permission);
 router.post('/lock', lock);
+router.post('/getGroup', getGroup);
 
 module.exports = router;
 
@@ -145,6 +147,36 @@ function lock(req, res) {
         memberService.lock(member_id, group)
             .then(function (msg) {
                 res.sendStatus(200);
+            })
+            .catch(function (err) {
+                res.status(400).send(err);
+            });
+    }
+}
+
+/**
+ * get list affiliated  groups
+ * @param req: author = Id user, token,
+ * @param res
+ */
+function getGroup(req, res){
+
+    var author = req.body.author;
+    var token = req.body.token;
+
+    // check token
+    tokenService.checkToken(author, token)
+        .then(function (subMsg) {
+            getListGroups();
+        }).catch(function (subErr) {
+        res.status(400).send(subErr);
+    });
+
+    // get list group
+    function getListGroups(){
+        memberService.getGroup(author)
+            .then(function (groups) {
+                res.status(200).send({groups: groups});
             })
             .catch(function (err) {
                 res.status(400).send(err);

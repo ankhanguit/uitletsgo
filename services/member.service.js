@@ -7,6 +7,7 @@
  * F- lockMember
  * F- findMember
  * F- findOne
+ * F- getGroup
  *
  * Update: 10/23/2016.
  */
@@ -27,6 +28,7 @@ service.permit = permitMember;
 service.lock = lockMember;
 service.findMember = findMember;
 service.findOne = findOne;
+service.getGroup = getGroup;
 
 module.exports = service;
 
@@ -40,6 +42,13 @@ function joinGroup(author, groupId) {
     var deferred = Q.defer();
 
     var objInsert = {'MEMBER_ID': mongo.helper.toObjectID(author), 'JOIN_DATE' : new Date(), 'PERMIT' : 0 , 'ROLE' : 7};
+    var memberInsert = {
+        'MEMBER_ID': mongo.helper.toObjectID(author),
+        'GROUP_ID': mongo.helper.toObjectID(groupId),
+        'JOIN_DATE' : new Date(),
+        'PERMIT' : 0 ,
+        'ROLE' : 7};
+
     // validation
     var groupDb = db.collection("group_member_" + groupId);
 
@@ -72,8 +81,19 @@ function joinGroup(author, groupId) {
                     console.log("[" + new Date()  + "][group.service.js][joinGroup] : " + err.name + ': ' + err.message);
                 }
 
-                var msg = {success: true};
-                deferred.resolve(msg);
+                db.members.insert(
+                    memberInsert,
+                    function (err, doc) {
+                        if(err){
+                            deferred.reject(utils.message("MSG002-CM-E"));
+                            console.log("[" + new Date()  + "][group.service.js][joinGroup] : " + err.name + ': ' + err.message);
+                        }
+
+                        var msg = {success: true};
+                        deferred.resolve(msg);
+                    }
+                );
+
             });
     }
     return deferred.promise;
@@ -100,8 +120,19 @@ function leaveGroup(member_id, groupId) {
                 console.log("[" + new Date()  + "][group.service.js][leaveGroup] : " + err.name + ': ' + err.message);
             }
 
-            var msg = {success: true};
-            deferred.resolve(msg);
+            db.members.remove(
+                {MEMBER_ID: mongo.helper.toObjectID(member_id), GROUP_ID: mongo.helper.toObjectID(groupId)},
+                function (err, doc) {
+                    if(err){
+                        deferred.reject(utils.message("MSG002-CM-E"));
+                        console.log("[" + new Date()  + "][group.service.js][leaveGroup] : " + err.name + ': ' + err.message);
+                    }
+
+                    var msg = {success: true};
+                    deferred.resolve(msg);
+                }
+
+            );
         });
 
     return deferred.promise;
@@ -134,8 +165,20 @@ function permitMember(member_Id, groupId) {
                 console.log("[" + new Date()  + "][group.service.js][permitMember] : " + err.name + ': ' + err.message);
             }
 
-            var msg = {success: true};
-            deferred.resolve(msg);
+            db.members.update(
+                {MEMBER_ID: mongo.helper.toObjectID(member_id), GROUP_ID: mongo.helper.toObjectID(groupId)},
+                { $set: set },
+                function (err, doc) {
+                    if(err){
+                        deferred.reject(utils.message("MSG002-CM-E"));
+                        console.log("[" + new Date()  + "][group.service.js][permitMember] : " + err.name + ': ' + err.message);
+                    }
+
+                    var msg = {success: true};
+                    deferred.resolve(msg);
+                }
+
+            );
         });
     return deferred.promise;
 }
@@ -167,8 +210,20 @@ function lockMember(member_Id, groupId) {
                 console.log("[" + new Date()  + "][group.service.js][lockMember] : " + err.name + ': ' + err.message);
             }
 
-            var msg = {success: true};
-            deferred.resolve(msg);
+            db.members.update(
+                {MEMBER_ID: mongo.helper.toObjectID(member_id), GROUP_ID: mongo.helper.toObjectID(groupId)},
+                { $set: set },
+                function (err, doc) {
+                    if(err){
+                        deferred.reject(utils.message("MSG002-CM-E"));
+                        console.log("[" + new Date()  + "][group.service.js][permitMember] : " + err.name + ': ' + err.message);
+                    }
+
+                    var msg = {success: true};
+                    deferred.resolve(msg);
+                }
+
+            );
         });
     return deferred.promise;
 }
@@ -239,6 +294,38 @@ function findOne(memberId, groupId){
             }
 
         });
+
+    return deferred.promise;
+}
+
+/**
+ * get under group
+ * @param memberId
+ */
+function getGroup(memberId){
+    var deferred = Q.defer();
+    // prepare query
+    db.members.aggregate([
+        { $match: {'MEMBER_ID': memberId}},
+        { $lookup: { from: "groups", localField: "GROUP_ID", foreignField: "_id", as: "GROUP_INFO"}},
+        { $unwind : "$GROUP_INFO"},
+        { $project: { GROUP_ID : 1, JOIN_DATE : 1, GROUP_NAME : "$GROUP_INFO.NAME", GROUP_DESCRIPTION: "$GROUP_INFO.DESCRIPTION"}}
+
+    ],function (err, groups) {
+        if (err){
+            // database error
+            deferred.reject(utils.message("MSG002-CM-E"));
+            console.log("[" + new Date()  + "][member.service.js][getGroup] : " + err.name + ': ' + err.message);
+        }
+
+        // check result empty
+        if(!_.isEmpty(groups)){
+            deferred.resolve(groups);
+        }else{
+            // result null
+            deferred.reject(utils.message("MSG007-MB-I"));
+        }
+    });
 
     return deferred.promise;
 }

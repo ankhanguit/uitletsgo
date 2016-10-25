@@ -418,7 +418,7 @@ function getSchedule(member_id, _id){
 
                 if (group) {
                     // return schedule
-                    deferred.resolve({SCHEDULE: group.SCHEDULE , UPDATE_SCHEDULE_DATE: group.UPDATE_SCHEDULE_DATE});
+                    deferred.resolve({SCHEDULE: group.SCHEDULE , UPDATE_SCHEDULE_DATE: group.UPDATE_SCHEDULE_DATE, AUTHOR: group.AUTHOR});
                 } else {
                     // user not found
                     deferred.reject(utils.message("MSG001-GP-E"));
@@ -452,7 +452,7 @@ function getPreparation(member_id, _id){
 
                 if (group) {
                     // return preparation
-                    deferred.resolve({PREPARATION: group.PREPARATION , UPDATE_PREPARATION_DATE: group.UPDATE_PREPARATION_DATE});
+                    deferred.resolve({PREPARATION: group.PREPARATION , UPDATE_PREPARATION_DATE: group.UPDATE_PREPARATION_DATE, AUTHOR: group.AUTHOR});
                 } else {
                     // user not found
                     deferred.reject(utils.message("MSG001-GP-E"));
