@@ -306,7 +306,7 @@ function getGroup(memberId){
     var deferred = Q.defer();
     // prepare query
     db.members.aggregate([
-        { $match: {'MEMBER_ID': memberId}},
+        { $match: {'MEMBER_ID': mongo.helper.toObjectID(memberId)}},
         { $lookup: { from: "groups", localField: "GROUP_ID", foreignField: "_id", as: "GROUP_INFO"}},
         { $unwind : "$GROUP_INFO"},
         { $project: { GROUP_ID : 1, JOIN_DATE : 1, GROUP_NAME : "$GROUP_INFO.NAME", GROUP_DESCRIPTION: "$GROUP_INFO.DESCRIPTION"}}
