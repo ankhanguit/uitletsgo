@@ -368,7 +368,7 @@ function getMember(groupId, memberId){
                             console.log("[" + new Date()  + "][group.service.js][getMember] : " + err.name + ': ' + err.message);
                         }
 
-                        if (members) {
+                        if (!_.isEmpty(members)) {
                             // member exists
                             deferred.resolve(members);
                         } else {
