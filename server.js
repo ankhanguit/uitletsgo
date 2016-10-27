@@ -61,3 +61,4 @@ var server = app.listen(process.env.PORT, function () {
 
 var io = socket.listen(server);
 require('./socket/routes')(app, io);
+require('./socket/map.socket')(app, io);
