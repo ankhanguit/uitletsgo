@@ -3,7 +3,6 @@ var memberService = require('services/member.service');
 
 module.exports = function(app,io) {
 
-
     var map = io.of('/map').on('connection', function (socket) {
 
         socket.on('mConnect', function(data) {
@@ -11,8 +10,8 @@ module.exports = function(app,io) {
             var userId = data.userId;
             var token = data.token;
             var groupId = data.groupId;
-            var logintitude = data.longtitude;
-            var lasttitude = data.lastitude;
+            var longitude  = data.longitude ;
+            var latitude = data.latitude;
 
             // check token
             tokenService.checkToken(userId, token)
@@ -43,8 +42,8 @@ module.exports = function(app,io) {
                                     userId: socket.username,
                                     firstname: socket.firstname,
                                     lastname: socket.lastname,
-                                    longtitude: logintitude,
-                                    lastitude: lasttitude
+                                    longitude : longitude ,
+                                    latitude: latitude
                                 }
                             };
 
@@ -69,8 +68,8 @@ module.exports = function(app,io) {
 
         socket.on('mLocation', function(data) {
 
-            var logintitude = data.longtitude;
-            var lasttitude = data.lastitude;
+            var longitude  = data.longitude ;
+            var lassitude = data.lassitude;
 
             map.in(socket.room).emit('mMessage', {
                 message: "Send broadcast location successful",
@@ -80,8 +79,8 @@ module.exports = function(app,io) {
                     username: socket.username,
                     firstname: socket.firstname,
                     lastname: socket.lastname,
-                    longtitude: logintitude,
-                    lastitude: lasttitude
+                    longitude : longitude ,
+                    latitude: latitude
                 }
             });
         });
