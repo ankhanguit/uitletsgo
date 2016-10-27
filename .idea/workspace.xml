@@ -35,7 +35,7 @@
         <entry file="file://$PROJECT_DIR$/services/group.service.js">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="280" column="29" selection-start-line="280" selection-start-column="11" selection-end-line="280" selection-end-column="29" />
+              <caret line="273" column="17" selection-start-line="273" selection-start-column="17" selection-end-line="273" selection-end-column="17" />
               <folding />
             </state>
           </provider>
@@ -44,10 +44,10 @@
       <file leaf-file-name="member.service.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/services/member.service.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.64526486">
-              <caret line="370" column="50" selection-start-line="370" selection-start-column="50" selection-end-line="370" selection-end-column="50" />
+            <state vertical-scroll-proportion="0.5088282">
+              <caret line="372" column="44" selection-start-line="372" selection-start-column="44" selection-end-line="372" selection-end-column="44" />
               <folding>
-                <marker date="1477579027485" expanded="true" signature="0:213" placeholder="/** Created by panda94 on 09/12/2016. ...*/" />
+                <marker date="1477580196658" expanded="true" signature="0:213" placeholder="/** Created by panda94 on 09/12/2016. ...*/" />
               </folding>
             </state>
           </provider>
@@ -369,9 +369,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="784" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20121029" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20121029" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32928678" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -705,14 +705,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/services/avatar.service.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="116" column="13" selection-start-line="116" selection-start-column="13" selection-end-line="116" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/controllers/user.controller.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -737,6 +729,14 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/server.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="51" column="28" selection-start-line="51" selection-start-column="28" selection-end-line="51" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/controllers/member.controller.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -753,10 +753,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server.js">
+    <entry file="file://$PROJECT_DIR$/services/avatar.service.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="51" column="28" selection-start-line="51" selection-start-column="28" selection-end-line="51" selection-end-column="28" />
+          <caret line="116" column="13" selection-start-line="116" selection-start-column="13" selection-end-line="116" selection-end-column="13" />
           <folding />
         </state>
       </provider>
@@ -764,17 +764,17 @@
     <entry file="file://$PROJECT_DIR$/services/group.service.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="280" column="29" selection-start-line="280" selection-start-column="11" selection-end-line="280" selection-end-column="29" />
+          <caret line="273" column="17" selection-start-line="273" selection-start-column="17" selection-end-line="273" selection-end-column="17" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/services/member.service.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.64526486">
-          <caret line="370" column="50" selection-start-line="370" selection-start-column="50" selection-end-line="370" selection-end-column="50" />
+        <state vertical-scroll-proportion="0.5088282">
+          <caret line="372" column="44" selection-start-line="372" selection-start-column="44" selection-end-line="372" selection-end-column="44" />
           <folding>
-            <marker date="1477579027485" expanded="true" signature="0:213" placeholder="/** Created by panda94 on 09/12/2016. ...*/" />
+            <marker date="1477580196658" expanded="true" signature="0:213" placeholder="/** Created by panda94 on 09/12/2016. ...*/" />
           </folding>
         </state>
       </provider>

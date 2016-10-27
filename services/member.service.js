@@ -357,6 +357,7 @@ function getMember(groupId, memberId){
 
                 // get all members
                 groupDb.aggregate([
+                        { $match: {'MEMBER_ID': mongo.helper.toObjectID(memberId)}},
                         { $lookup: { from: "users", localField: "MEMBER_ID", foreignField: "_id", as: "MEMBER_INFO"}},
                         { $unwind : "$MEMBER_INFO"},
                         { $project: { MEMBER_ID : 1, JOIN_DATE: 1, ROLE: 1, FIRSTNAME : "$MEMBER_INFO.FIRSTNAME" ,LASTNAME : "$MEMBER_INFO.LASTNAME"}}
