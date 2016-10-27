@@ -47,8 +47,10 @@
   "MSG005-MB-I" : "You are not under any group",
   "MSG006-MB-I" : "Get a list of groups you under successful",
   "MSG007-MB-I" : "Get result null",
+  "MSG008-MB-I" : "Get all members in group successful",
   "MSG001-MB-E" : "Member was joined group already",
   "MSG002-MB-E" : "Member not exist",
+  "MSG003-MB-E" : "Group has no member",
 
 
   "MSG001-TK-E" : "Account not authenticated",

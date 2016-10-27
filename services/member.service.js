@@ -8,8 +8,9 @@
  * F- findMember
  * F- findOne
  * F- getGroup
+ * F- getMember
  *
- * Update: 10/23/2016.
+ * Update: 10/27/2016.
  */
 
 var config = require('config.json');
@@ -29,6 +30,7 @@ service.lock = lockMember;
 service.findMember = findMember;
 service.findOne = findOne;
 service.getGroup = getGroup;
+service.getMember = getMember;
 
 module.exports = service;
 
@@ -309,7 +311,7 @@ function getGroup(memberId){
         { $match: {'MEMBER_ID': mongo.helper.toObjectID(memberId)}},
         { $lookup: { from: "groups", localField: "GROUP_ID", foreignField: "_id", as: "GROUP_INFO"}},
         { $unwind : "$GROUP_INFO"},
-        { $project: { GROUP_ID : 1, JOIN_DATE : 1, GROUP_NAME : "$GROUP_INFO.NAME", GROUP_DESCRIPTION: "$GROUP_INFO.DESCRIPTION"}}
+        { $project: { GROUP_ID : 1, CREATEDATE : 1, NAME : "$GROUP_INFO.NAME", DESCRIPTION: "$GROUP_INFO.DESCRIPTION", CODE: "$GROUP_INFO.CODE"}}
 
     ],function (err, groups) {
         if (err){
@@ -326,6 +328,58 @@ function getGroup(memberId){
             deferred.reject(utils.message("MSG007-MB-I"));
         }
     });
+
+    return deferred.promise;
+}
+
+/**
+ * Get all members in group
+ * @param group_id
+ * @returns {*|promise}
+ */
+function getMember(groupId, memberId){
+    var deferred = Q.defer();
+
+    // validation
+    var groupDb = db.collection("group_member_" + groupId);
+
+    groupDb.findOne(
+        { MEMBER_ID: mongo.helper.toObjectID(memberId)},
+        function (err, member) {
+            if (err){
+                // database error
+                deferred.reject(utils.message("MSG002-CM-E"));
+                console.log("[" + new Date()  + "][group.service.js][joinGroup] : " + err.name + ': ' + err.message);
+            }
+
+            // member exists
+            if(member) {
+
+                // get all members
+                groupDb.aggregate([
+                        { $lookup: { from: "users", localField: "MEMBER_ID", foreignField: "_id", as: "MEMBER_INFO"}},
+                        { $unwind : "$MEMBER_INFO"},
+                        { $project: { MEMBER_ID : 1, JOIN_DATE: 1, ROLE: 1, FIRSTNAME : "$MEMBER_INFO.FIRSTNAME" ,LASTNAME : "$MEMBER_INFO.LASTNAME"}}
+                    ],
+                    function (err, members) {
+                        if (err){
+                            // database error
+                            deferred.reject(utils.message("MSG002-CM-E"));
+                            console.log("[" + new Date()  + "][group.service.js][getMember] : " + err.name + ': ' + err.message);
+                        }
+
+                        if (members) {
+                            // member exists
+                            deferred.resolve(members);
+                        } else {
+                            deferred.reject(utils.message("MSG003-MB-E"));
+                        }
+                    });
+            }else{
+                deferred.reject(utils.message("MSG003-MB-E"));
+            }
+
+        });
 
     return deferred.promise;
 }

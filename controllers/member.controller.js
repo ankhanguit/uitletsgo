@@ -6,6 +6,7 @@
  * F- Permit: (http://host/member/permit) : permit member join group
  * F- Lock: (http://host/member/lock) : lock member
  * F- getGroup (http://host/member/getGroup) : get list affiliated  groups
+ * F- getMember (http://host/member/getMember) : get all members in group
  *
  * Update: 10/12/2016.
  */
@@ -145,6 +146,33 @@ router.post('/getGroup', function (req, res) {
         }else if (response.statusCode == 200) {
             // get under groups successful
             return res.status(200).json({'message':utils.message("MSG006-MB-I") , 'successful' : 'true', 'info' : body.groups});
+        }else if(response.statusCode == 400){
+            // database error, get groups result null
+            res.status(400).json({'message':response.body , 'successful' : 'false', 'info' : ''});
+        }else{
+            // status exception
+            res.status(500).json({'message':utils.message("MSG003-CM-E"), 'successful' : 'false', 'info' : ''});
+        }
+    });
+});
+
+/**
+ * POST: get all members in group
+ * params: author = Id user, token
+ */
+router.post('/getMember', function (req, res) {
+    // register using api to maintain clean separation between layers
+    request.post({
+        url: config.apiUrl + '/members/getMember',
+        form: req.body,
+        json: true
+    }, function (error, response, body) {
+        if (error) {
+            // system error
+            res.status(401).json({'message':utils.message("MSG001-CM-I") , 'successful' : 'false', 'info' : ''});
+        }else if (response.statusCode == 200) {
+            // get under groups successful
+            return res.status(200).json({'message':utils.message("MSG008-MB-I") , 'successful' : 'true', 'info' : body.members});
         }else if(response.statusCode == 400){
             // database error, get groups result null
             res.status(400).json({'message':response.body , 'successful' : 'false', 'info' : ''});
