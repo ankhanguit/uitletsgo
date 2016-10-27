@@ -70,11 +70,12 @@ module.exports = function(app,io) {
 
             var longitude  = data.longitude ;
             var lassitude = data.lassitude;
+			var flag = data.flag;
 
             map.in(socket.room).emit('mMessage', {
                 message: "Send broadcast location successful",
                 success: "true",
-                flag: "new-location",
+                flag: flag,
                 data: {
                     username: socket.username,
                     firstname: socket.firstname,
