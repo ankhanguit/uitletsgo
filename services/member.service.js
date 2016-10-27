@@ -311,7 +311,7 @@ function getGroup(memberId){
         { $match: {'MEMBER_ID': mongo.helper.toObjectID(memberId)}},
         { $lookup: { from: "groups", localField: "GROUP_ID", foreignField: "_id", as: "GROUP_INFO"}},
         { $unwind : "$GROUP_INFO"},
-        { $project: { GROUP_ID : 1, CREATEDATE : 1, NAME : "$GROUP_INFO.NAME", DESCRIPTION: "$GROUP_INFO.DESCRIPTION", CODE: "$GROUP_INFO.CODE"}}
+        { $project: { GROUP_ID : 1, CREATEDATE : 1, AUTHOR: "$GROUP_INFO.AUTHOR", NAME : "$GROUP_INFO.NAME", DESCRIPTION: "$GROUP_INFO.DESCRIPTION", CODE: "$GROUP_INFO.CODE"}}
 
     ],function (err, groups) {
         if (err){
@@ -357,10 +357,10 @@ function getMember(groupId, memberId){
 
                 // get all members
                 groupDb.aggregate([
-                        { $lookup: { from: "users", localField: "MEMBER_ID", foreignField: "_id", as: "AUTHOR_INFO"}},
-                        { $unwind : "$AUTHOR_INFO"},
-                        { $project: { MEMBER_ID : 1, GROUP_ID : 1, FIRSTNAME : "$AUTHOR_INFO.FIRSTNAME" ,LASTNAME : "$AUTHOR_INFO.LASTNAME"}}
-                ],
+                        { $lookup: { from: "users", localField: "MEMBER_ID", foreignField: "_id", as: "MEMBER_INFO"}},
+                        { $unwind : "$MEMBER_INFO"},
+                        { $project: { MEMBER_ID : 1, JOIN_DATE: 1, ROLE: 1, FIRSTNAME : "$MEMBER_INFO.FIRSTNAME" ,LASTNAME : "$MEMBER_INFO.LASTNAME"}}
+                    ],
                     function (err, members) {
                         if (err){
                             // database error

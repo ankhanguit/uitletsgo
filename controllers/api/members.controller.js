@@ -207,7 +207,7 @@ function getMember(req, res){
 
     // get list group
     function getListMembers(){
-        memberService.getMember(group_id)
+        memberService.getMember(group_id, author)
             .then(function (members) {
                 res.status(200).send({members: members});
             })
