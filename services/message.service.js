@@ -87,17 +87,20 @@ function getNewestMessage(groupId){
 
 /**
  * get group chat messages
- * @param begin
- * @param end
+ * @param getBegin
+ * @param getEnd
  * @param groupId
+ * @param memberId
  * @returns {*}
  */
-function getMessage(begin, end, groupId){
+function getMessage(getBegin, getEnd, groupId, memberId){
 
     var deferred = Q.defer();
 
     // limit message get
-    var limit = end - begin;
+    var limit = getEnd - getBegin;
+    var begin = parseInt(getBegin, 10);
+    var end = parseInt(getEnd, 10);
 
     // validation
     var messageDb = db.collection("group_message_" + groupId);
@@ -125,7 +128,7 @@ function getMessage(begin, end, groupId){
                             console.log("[" + new Date()  + "][message.service.js][getMessage] : " + err.name + ': ' + err.message);
                         }
 
-                        if(count < begin){
+                        if(count > begin){
                             messageDb.aggregate([
                                     { $lookup: { from: "users", localField: "MEMBER_ID", foreignField: "_id", as: "AUTHOR_INFO"}},
                                     { $limit : limit },
@@ -148,7 +151,7 @@ function getMessage(begin, end, groupId){
                                         console.log("[" + new Date()  + "][message.service.js][getMessage] : " + err.name + ': ' + err.message);
                                     }
 
-                                    deferred.resolve({messages: messages, count: count});
+                                    deferred.resolve({messages: messages, count: count, remain: count - end});
                                 });
                         }else{
                             deferred.reject(utils.message("MSG001-MS-E"));

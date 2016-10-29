@@ -327,7 +327,7 @@ function getGroupMessages(req, res){
 
     // get group schedule
     function getMessages(){
-        messageService.getMessages(groupId, begin, end)
+        messageService.getMessages(begin, end, groupId, author)
             .then(function (data) {
                 res.status(200).send({data: data});
             })
