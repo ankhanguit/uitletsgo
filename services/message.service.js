@@ -131,8 +131,8 @@ function getMessage(getBegin, getEnd, groupId, memberId){
                         if(count > begin){
                             messageDb.aggregate([
                                     { $lookup: { from: "users", localField: "MEMBER_ID", foreignField: "_id", as: "AUTHOR_INFO"}},
-                                    { $limit : limit },
                                     { $skip: begin},
+                                    { $limit : limit },
                                     { $sort: {"CREATE_DATE": -1}},
                                     { $unwind : "$AUTHOR_INFO"},
                                     { $project: {
