@@ -10,6 +10,7 @@
  * F- Search: (http://host/group/search) : search group (public)
  * F- GetSchedule: (http://host/group/getSchedule) : get group schedule
  * F- GetPreparation: (http://host/group/getPreparation) : get group preparation
+ * F- GetMessages: (http://host/group/getMessages) : get group chat messages
  *
  * Update: 10/23/2016.
  */
@@ -264,4 +265,33 @@ router.post('/getPreparation', function (req, res) {
         }
     });
 });
+
+/**
+ * POST: get group chat messages
+ * params: author = Id user, token, id = Id group, begin, end
+ */
+router.post('/getMessages', function (req, res) {
+    // register using api to maintain clean separation between layers
+    request.post({
+        url: config.apiUrl + '/groups/getMessages',
+        form: req.body,
+        json: true
+    }, function (error, response, body) {
+        if (error) {
+            // system error
+            res.status(401).json({'message':utils.message("MSG001-CM-I") , 'successful' : 'false', 'info' : ''});
+        }else if (response.statusCode == 200) {
+            // search has result
+            return res.status(200).json({'message':utils.message("MSG001-MS-I") , 'successful' : 'true', 'info' : body.data});
+        }else if(response.statusCode == 400){
+            // database error, result search null
+            res.status(400).json({'message':response.body , 'successful' : 'false', 'info' : ''});
+        }else{
+            // status exception
+            res.status(500).json({'message':utils.message("MSG003-CM-E"), 'successful' : 'false', 'info' : ''});
+        }
+    });
+});
+
+
 module.exports = router;

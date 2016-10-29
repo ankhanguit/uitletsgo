@@ -9,8 +9,9 @@
  * F- Search: (http://host/api/groups/search), middleware: (http://host/group/search) : search all group by name
  * F- UpdateSchedule: (http://host/groups/updateSchedule) , middleware: (http://host/group/updateSchedule) : update group schedule
  * F- UpdatePreparation: (http://host/groups/updatePreparation) , middleware: (http://host/group/updatePreparation) : update group preparation
- * F- getSchedule: (http://host/groups/getSchedule) , middleware: (http://host/group/getSchedule) : get group schedule
- * F- getPreparation: (http://host/groups/getPreparation) , middleware: (http://host/group/getPreparation) : get group preparation
+ * F- GetSchedule: (http://host/groups/getSchedule) , middleware: (http://host/group/getSchedule) : get group schedule
+ * F- GetPreparation: (http://host/groups/getPreparation) , middleware: (http://host/group/getPreparation) : get group preparation
+ * F- GetMessages: (http://host/groups/getMessages) , middleware: (http://host/group/getMessages) : get group chat messages
  *
  * Update: 10/23/2016.
  */
@@ -22,6 +23,7 @@ var utils = require('logic/utils.logic');
 
 var groupService = require('services/group.service');
 var tokenService = require('services/token.service');
+var messageService = require('services/message.service');
 
 
 // routes
@@ -32,6 +34,7 @@ router.put('/updateSchedule', updateGroupSchedule);
 router.put('/updatePreparation', updateGroupPreparation);
 router.post('/getSchedule', getGroupSchedule);
 router.post('/getPreparation', getGroupPreparation);
+router.post('/getMessages', getGroupMessages);
 router.post('/get', getList);
 router.post('/search', search);
 
@@ -294,6 +297,39 @@ function getGroupSchedule(req, res){
         groupService.getSchedule(author, groupId)
             .then(function (schedule) {
                 res.status(200).send({schedule: schedule});
+            })
+            .catch(function (err) {
+                res.status(400).send(err);
+            });
+    }
+}
+
+/**
+ * Get group chat messages
+ * @param req: author = Id user, token, id = Id group, getBegin, getEnd
+ * @param res
+ */
+function getGroupMessages(req, res){
+
+    var author = req.body.author;
+    var token = req.body.token;
+    var groupId = req.body.id;
+    var begin = req.body.begin;
+    var end = req.body.end;
+
+    // check token
+    tokenService.checkToken(author, token)
+        .then(function (subMsg) {
+            getMessages();
+        }).catch(function (subErr) {
+        res.status(400).send(subErr);
+    });
+
+    // get group schedule
+    function getMessages(){
+        messageService.getMessages(groupId, begin, end)
+            .then(function (data) {
+                res.status(200).send({data: data});
             })
             .catch(function (err) {
                 res.status(400).send(err);

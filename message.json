@@ -52,6 +52,9 @@
   "MSG002-MB-E" : "Member not exist",
   "MSG003-MB-E" : "Group has no member",
 
+  "MSG001-MS-I" : "Get messages successful",
+  "MSG001-MS-E" : "No messages more",
+
 
   "MSG001-TK-E" : "Account not authenticated",
 
