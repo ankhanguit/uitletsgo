@@ -28,6 +28,7 @@ app.use('/api', expressJwt({ secret: config.secret }).unless({ path: [
     '/api/groups/updatePreparation',
     '/api/groups/getSchedule',
     '/api/groups/getPreparation',
+    '/api/groups/getMessages',
     '/api/groups/get',
     '/api/groups/search',
     '/api/groups/delete',
