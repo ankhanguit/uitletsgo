@@ -283,7 +283,7 @@ function getAvatar(req, res) {
 function search(req, res){
 
     var name = req.body.name;
-    groupService.search(name)
+    userService.search(name)
         .then(function (users) {
             res.status(200).send({users: users});
         })
