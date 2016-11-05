@@ -14,6 +14,7 @@
  * F- UpdatePassword (http://host/api/users/updatePassword), middleware: (http://host/user/updatePassword) : update password
  * F- UploadAvatar (http://host/api/users/uploadAvatar), middleware: (http://host/user/uploadAvatar) : save or update user avatar
  * F- GetAvatar (http://host/api/users/getAvatar), middleware: (http://host/user/getAvatar) : get user avatar
+ * F- Search (http://host/api/users/search), middleware: (http://host/user/search) : search users by username, firstname, lastname
  *
  *
  * Update: 10/12/2016.
@@ -39,6 +40,7 @@ router.post('/getAvatar', getAvatar);
 router.post('/uploadAvatar', uploadAvatar);
 router.post('/requestChangePassword' , requestChangePassword);
 router.post('/validateDynamicCode' , validateDynamicCode);
+router.post('/search' , search);
 router.put('/newPassword' , newPassword);
 router.put('/updatePassword' , updatePassword);
 router.get('/current', getCurrentUser);
@@ -263,11 +265,27 @@ function uploadAvatar(req, res) {
  */
 function getAvatar(req, res) {
     var author = req.body.author;
-    var token = req.body.token;
 
     avatarService.get(author)
         .then(function (avatar) {
             res.status(200).send({avatar: avatar});
+        })
+        .catch(function (err) {
+            res.status(400).send(err);
+        });
+}
+
+/**
+ * Search users by username, firstname, lastname
+ * @param req: name =  username, firstname, lastname (prefix)
+ * @param res
+ */
+function search(req, res){
+
+    var name = req.body.name;
+    groupService.search(name)
+        .then(function (users) {
+            res.status(200).send({users: users});
         })
         .catch(function (err) {
             res.status(400).send(err);
@@ -289,7 +307,7 @@ function createToken(author, token){
 
 /**
  * Send code new password to user email
- * @param reciever
+ * @param receiver
  * @param userId
  * @param req
  * @param res

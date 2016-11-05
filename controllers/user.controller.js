@@ -9,7 +9,7 @@
  * F- UpdatePassword (http://host/user/updatepassword) : user update password
  * F- UploadAvatar (http://host/user/uploadAvatar) : user upload avatar
  * F- GetAvatar (http://host/user/getAvatar) : user get avatar
- *
+ * F- Search (http://host/user/search) : search users by username, firstname, lastname
  * Update: 15/12/2016.
  */
 
@@ -248,6 +248,33 @@ router.post('/getAvatar', function (req, res) {
             res.status(500).json({'message':utils.message("MSG003-CM-E"), 'successful' : 'false', 'info' : ''});
         }
 
+    });
+});
+
+/**
+ * POST: search users by username, firstname, lastname (public)
+ * params: name = username, firstname, lastname (prefix)
+ */
+router.post('/search', function (req, res) {
+    // register using api to maintain clean separation between layers
+    request.post({
+        url: config.apiUrl + '/users/search',
+        form: req.body,
+        json: true
+    }, function (error, response, body) {
+        if (error) {
+            // system error
+            res.status(401).json({'message':utils.message("MSG001-CM-I") , 'successful' : 'false', 'info' : ''});
+        }else if (response.statusCode == 200) {
+            // search has result
+            return res.status(200).json({'message':utils.message("MSG009-UR-I") , 'successful' : 'true', 'info' : body.users});
+        }else if(response.statusCode == 400){
+            // database error, result search null
+            res.status(400).json({'message':response.body , 'successful' : 'false', 'info' : ''});
+        }else{
+            // status exception
+            res.status(500).json({'message':utils.message("MSG003-CM-E"), 'successful' : 'false', 'info' : ''});
+        }
     });
 });
 

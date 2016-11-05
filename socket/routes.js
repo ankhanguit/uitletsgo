@@ -71,27 +71,27 @@ module.exports = function(app,io) {
 			var message = data.message;
 
 			groupMessageService.addGroupMessage(userId, groupId, message)
-					.then(function (member) {
-						chat.in(socket.room).emit('mMessage', {
-							message: "Send broadcast message successful",
-							success: "true",
-							flag: "new-message",
-							data: {
-								message: data.message,
-								userId: socket.user_id,
-								username: socket.username,
-								firstname: socket.firstname,
-								lastname: socket.lastname
-							}
-						});
-					}).catch(function (subErr) {
-
-					socket.emit('mMessage', {
-						message: "Can't save this message",
-						success: "false",
-						flag: "save-false",
-						data: ""
+				.then(function (member) {
+					chat.in(socket.room).emit('mMessage', {
+						message: "Send broadcast message successful",
+						success: "true",
+						flag: "new-message",
+						data: {
+							message: data.message,
+							userId: socket.user_id,
+							username: socket.username,
+							firstname: socket.firstname,
+							lastname: socket.lastname
+						}
 					});
+				}).catch(function (subErr) {
+
+				socket.emit('mMessage', {
+					message: "Can't save this message",
+					success: "false",
+					flag: "save-false",
+					data: ""
+				});
 
 			});
 

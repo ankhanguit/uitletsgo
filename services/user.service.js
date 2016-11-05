@@ -10,8 +10,9 @@
  * F- _delete
  * F- updatePassword
  * F- updateDynamicCode
+ * F- search
  *
- * Update: 10/12/2016.
+ * Update: 11/05/2016.
  */
 
 var config = require('config.json');
@@ -35,6 +36,7 @@ service.updateDynamicCode = updateDynamicCode;
 service.validateDynamicCode = validateDynamicCode;
 service.newPassword = newPassword;
 service.updatePassword = updatePassword;
+service.search = search;
 
 module.exports = service;
 
@@ -410,5 +412,37 @@ function _delete(_id) {
             deferred.resolve();
         });
 
+    return deferred.promise;
+}
+
+/**
+ * find user
+ * @param text
+ */
+function search(text) {
+    var deferred = Q.defer();
+    // prepare query
+    db.users.aggregate([
+        { $match: {$or: [{ USERNAME:  new RegExp(text, "i")}, { FIRSTNAME: new RegExp(text, "i") },  { LASTNAME: new RegExp(text, "i") }]}},
+        { $lookup: { from: "avatars", localField: "_id", foreignField: "USER_ID", as: "AVATAR_INFO"}},
+        { $limit : 10 },
+        { $unwind : "$AVATAR_INFO"},
+        { $project: { _id: 1, USERNAME : 1, FIRSTNAME : 1, LASTNAME : 1, EMAIL: 1, PHONE: 1, AVATAR : "$AVATAR_INFO.AVATAR"}}
+
+    ],function (err, users) {
+        if (err){
+            // database error
+            deferred.reject(utils.message("MSG002-CM-E"));
+            console.log("[" + new Date()  + "][user.service.js][find] : " + err.name + ': ' + err.message);
+        }
+
+        // check result empty
+        if(!_.isEmpty(users)){
+            deferred.resolve(users);
+        }else{
+            // result null
+            deferred.reject(utils.message("MSG008-UR-I"));
+        }
+    });
     return deferred.promise;
 }
