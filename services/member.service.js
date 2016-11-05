@@ -359,7 +359,15 @@ function getMember(groupId, memberId){
                 groupDb.aggregate([
                         { $lookup: { from: "users", localField: "MEMBER_ID", foreignField: "_id", as: "MEMBER_INFO"}},
                         { $unwind : "$MEMBER_INFO"},
-                        { $project: { MEMBER_ID : 1, JOIN_DATE: 1, ROLE: 1, FIRSTNAME : "$MEMBER_INFO.FIRSTNAME" ,LASTNAME : "$MEMBER_INFO.LASTNAME"}}
+                        { $project: {
+                            MEMBER_ID : 1,
+                            JOIN_DATE: 1,
+                            ROLE: 1,
+                            FIRSTNAME : "$MEMBER_INFO.FIRSTNAME" ,
+                            LASTNAME : "$MEMBER_INFO.LASTNAME",
+                            USERNAME: "$MEMBER_INFO.USERNAME",
+                            PHONE:"$MEMBER_INFO.PHONE" }
+                        }
                     ],
                     function (err, members) {
                         if (err){
