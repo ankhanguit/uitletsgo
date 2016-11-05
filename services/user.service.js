@@ -423,7 +423,11 @@ function search(text) {
     var deferred = Q.defer();
     // prepare query
     db.users.aggregate([
-            { $match: {$or: [{ USERNAME:  new RegExp(text, "i")}, { FIRSTNAME: new RegExp(text, "i") },  { LASTNAME: new RegExp(text, "i") }]}}
+            { $match: {$or: [{ USERNAME:  new RegExp(text, "i")}, { FIRSTNAME: new RegExp(text, "i") },  { LASTNAME: new RegExp(text, "i") }]}},
+            { $lookup: { from: "avatars", localField: "_id", foreignField: "USER_ID", as: "AVATAR_INFO"}},
+            { $limit : 10 },
+            { $unwind : "$AVATAR_INFO"},
+            { $project: { _id: 1, USERNAME : 1, FIRSTNAME : 1, LASTNAME : 1, EMAIL: 1, PHONE: 1, AVATAR : "$AVATAR_INFO.AVATAR"}}
 
     ],function (err, users) {
         if (err){
