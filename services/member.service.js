@@ -246,7 +246,13 @@ function findMember(memberId, groupId){
             { $match: {'MEMBER_ID': mongo.helper.toObjectID(memberId)}},
             { $lookup: { from: "users", localField: "MEMBER_ID", foreignField: "_id", as: "AUTHOR_INFO"}},
             { $unwind : "$AUTHOR_INFO"},
-            { $project: { MEMBER_ID : 1, GROUP_ID : 1, FIRSTNAME : "$AUTHOR_INFO.FIRSTNAME" ,LASTNAME : "$AUTHOR_INFO.LASTNAME"}}
+            { $project: {
+                MEMBER_ID : 1,
+                GROUP_ID : 1,
+                FIRSTNAME : "$AUTHOR_INFO.FIRSTNAME" ,
+                LASTNAME : "$AUTHOR_INFO.LASTNAME",
+                USERNAME: "$AUTHOR_INFO.USERNAME"}
+            }
         ],
         function (err, member) {
             if (err){
