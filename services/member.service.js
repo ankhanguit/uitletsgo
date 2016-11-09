@@ -3,11 +3,11 @@
  * Service , reference dynamic collection name, syntax :[ group_member_ + Id group]
  * F- joinGroup
  * F- leaveGroup
- * F- permitMember
  * F- lockMember
  * F- findMember
  * F- findOne
  * F- getGroup
+ * F- permitMember
  * F- getMember
  *
  * Update: 10/27/2016.

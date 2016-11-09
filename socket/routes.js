@@ -23,7 +23,7 @@ module.exports = function(app,io) {
 
 
 									// setting socket infor
-									socket.user_id = userId;
+									socket.userid = userId;
 									socket.firstname = member.FIRSTNAME;
 									socket.lastname = member.LASTNAME;
 									socket.username = member.USERNAME;
@@ -38,7 +38,7 @@ module.exports = function(app,io) {
 										success: "true",
 										flag: "new-member",
 										data: {
-											userId: socket.user_id,
+											userId: socket.userid,
 											firstname: socket.firstname,
 											lastname: socket.lastname,
 											username: socket.username
@@ -66,7 +66,7 @@ module.exports = function(app,io) {
 
 		socket.on('mMessage', function(data) {
 
-			var userId = socket.user_id;
+			var userId = socket.userid;
 			var groupId = socket.room;
 			var message = data.message;
 
