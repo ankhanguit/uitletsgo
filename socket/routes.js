@@ -78,7 +78,7 @@ module.exports = function(app,io) {
 						flag: "new-message",
 						data: {
 							message: data.message,
-							userId: socket.user_id,
+							userId: socket.userid,
 							username: socket.username,
 							firstname: socket.firstname,
 							lastname: socket.lastname
