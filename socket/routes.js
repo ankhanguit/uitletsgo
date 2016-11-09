@@ -66,7 +66,7 @@ module.exports = function(app,io) {
 
 		socket.on('mMessage', function(data) {
 
-			var userId = socket.username;
+			var userId = socket.user_id;
 			var groupId = socket.room;
 			var message = data.message;
 
