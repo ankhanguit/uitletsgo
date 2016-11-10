@@ -69,7 +69,7 @@ module.exports = function(app,io) {
         socket.on('mLocation', function(data) {
 
             var longitude  = data.longitude ;
-            var latitude = data.latitude;
+            var lassitude = data.lassitude;
 			var flag = data.flag;
 
             map.in(socket.room).emit('mMessage', {
