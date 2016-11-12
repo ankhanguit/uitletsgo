@@ -25,9 +25,10 @@ module.exports = function(app,io) {
 
 
                             // setting socket information
-                            socket.username = userId;
+                            socket.userid = userId;
                             socket.firstname = member.FIRSTNAME;
                             socket.lastname = member.LASTNAME;
+							socket.username = member.USERNAME;
                             socket.room = groupId;
 
                             // Add the client to the room
@@ -39,9 +40,10 @@ module.exports = function(app,io) {
                                 success: "true",
                                 flag: "new-member",
                                 data: {
-                                    userId: socket.username,
+                                    userId: socket.userid,
                                     firstname: socket.firstname,
                                     lastname: socket.lastname,
+									username: socket.username,
                                     longitude : longitude ,
                                     latitude: latitude
                                 }
@@ -69,14 +71,15 @@ module.exports = function(app,io) {
         socket.on('mLocation', function(data) {
 
             var longitude  = data.longitude ;
-            var lassitude = data.lassitude;
+            var latitude = data.latitude;
 			var flag = data.flag;
 
-            map.in(socket.room).emit('mMessage', {
+            map.in(socket.room).emit('mLocation', {
                 message: "Send broadcast location successful",
                 success: "true",
                 flag: flag,
                 data: {
+					userId : socket.userid,
                     username: socket.username,
                     firstname: socket.firstname,
                     lastname: socket.lastname,
