@@ -139,6 +139,7 @@ function getMessage(getBegin, getEnd, groupId, memberId){
                                         MESSAGE : 1,
                                         AUTHOR_FIRSTNAME : "$AUTHOR_INFO.FIRSTNAME" ,
                                         AUTHOR_LASTNAME : "$AUTHOR_INFO.LASTNAME",
+                                        AUTHOR_USERNAME: "$AUTHOR_INFO.USERNAME",
                                         MEMBER_ID: 1,
                                         CREATE_DATE: 1
                                     }

@@ -8,6 +8,8 @@
  * F- LockMember: (http://host/api/members/lock), middleware: (http://host/member/lock) : lock member from group own
  * F- getGroup: (http://host/api/members/getGroup), middleware: (http://host/member/getGroup) : get list affiliated  groups
  * F- getMember: (http://host/api/members/getMember), middleware: (http://host/member/getMember) : get all members in groups
+ * F- addTask: (http://host/api/members/addTask), middleware: (http://host/member/addTask) : add member task
+ * F- getTask: (http://host/api/members/getTask), middleware: (http://host/member/getTask) : get member task
  *
  * Update: 10/12/2016.
  */
@@ -27,6 +29,8 @@ router.post('/permit', permission);
 router.post('/lock', lock);
 router.post('/getGroup', getGroup);
 router.post('/getMember', getMember);
+router.post('/addTask', addTask);
+router.post('/getTask', getTask);
 
 module.exports = router;
 
@@ -216,3 +220,69 @@ function getMember(req, res){
             });
     }
 }
+
+/**
+ * Add member task
+ * @param req: author = Id user, token, id = Id group, memberId, task
+ * @param res
+ */
+function addTask(req, res){
+
+    var author = req.body.author;
+    var token = req.body.token;
+    var group_id = req.body.id;
+    var member_id = req.body.memberId;
+    var task = req.body.task;
+
+    // check token
+    tokenService.checkToken(author, token)
+        .then(function (subMsg) {
+            addMemberTask();
+        }).catch(function (subErr) {
+        res.status(400).send(subErr);
+    });
+
+    // add member task
+    function addMemberTask(){
+        memberService.addTask(group_id, member_id, task)
+            .then(function (msg) {
+                res.sendStatus(200);
+            })
+            .catch(function (err) {
+                res.status(400).send(err);
+            });
+    }
+}
+
+/**
+ * Get member task
+ * @param req: author = Id user, token, id = Id group
+ * @param res
+ */
+function getTask(req, res){
+
+    var author = req.body.author;
+    var token = req.body.token;
+    var group_id = req.body.id;
+
+    // check token
+    tokenService.checkToken(author, token)
+        .then(function (subMsg) {
+            getMemberTask();
+        }).catch(function (subErr) {
+        res.status(400).send(subErr);
+    });
+
+    // get member task
+    function getMemberTask(){
+        memberService.addTask(group_id, author)
+            .then(function (task) {
+                res.status(200).send({task: task});
+            })
+            .catch(function (err) {
+                res.status(400).send(err);
+            });
+    }
+}
+
+

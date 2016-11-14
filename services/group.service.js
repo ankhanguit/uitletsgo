@@ -92,7 +92,8 @@ function create(groupParam) {
         CREATEDATE: new Date(),
         UPDATEDATE: new Date(),
         UPDATE_PREPARATION_DATE: new Date(),
-        UPDATE_SCHEDULE_DATE: new Date()
+        UPDATE_SCHEDULE_DATE: new Date(),
+        PRIVATE: groupParam.private
     };
 
     // insert group profile to database
@@ -264,7 +265,7 @@ function findByName(groupName){
     var deferred = Q.defer();
     // prepare query
     db.groups.aggregate([
-        { $match: {'NAME': new RegExp(groupName, "i")}},
+        { $match: {'NAME': new RegExp(groupName, "i") , 'PRIVATE':0}},
         { $lookup: { from: "users", localField: "AUTHOR", foreignField: "_id", as: "AUTHOR_INFO"}},
         { $limit : 20 },
         { $unwind : "$AUTHOR_INFO"},

@@ -73,6 +73,7 @@ module.exports = function(app,io) {
             var longitude  = data.longitude ;
             var latitude = data.latitude;
 			var flag = data.flag;
+            var time = new Date();
 
             map.in(socket.room).emit('mLocation', {
                 message: "Send broadcast location successful",
@@ -84,7 +85,8 @@ module.exports = function(app,io) {
                     firstname: socket.firstname,
                     lastname: socket.lastname,
                     longitude : longitude ,
-                    latitude: latitude
+                    latitude: latitude,
+                    time: time
                 }
             });
         });

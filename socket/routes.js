@@ -69,6 +69,7 @@ module.exports = function(app,io) {
 			var userId = socket.userid;
 			var groupId = socket.room;
 			var message = data.message;
+			var time = new Date();
 
 			groupMessageService.addGroupMessage(userId, groupId, message)
 				.then(function (member) {
@@ -81,7 +82,8 @@ module.exports = function(app,io) {
 							userId: socket.userid,
 							username: socket.username,
 							firstname: socket.firstname,
-							lastname: socket.lastname
+							lastname: socket.lastname,
+							time: time
 						}
 					});
 				}).catch(function (subErr) {

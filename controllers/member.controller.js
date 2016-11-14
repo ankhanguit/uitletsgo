@@ -7,6 +7,8 @@
  * F- Lock: (http://host/member/lock) : lock member
  * F- getGroup (http://host/member/getGroup) : get list affiliated  groups
  * F- getMember (http://host/member/getMember) : get all members in group
+ * F- addTask (http://host/member/addTask) : add member task
+ * F- getTask (http://host/member/getTask) : get member task
  *
  * Update: 10/12/2016.
  */
@@ -173,6 +175,60 @@ router.post('/getMember', function (req, res) {
         }else if (response.statusCode == 200) {
             // get under groups successful
             return res.status(200).json({'message':utils.message("MSG008-MB-I") , 'successful' : 'true', 'info' : body.members});
+        }else if(response.statusCode == 400){
+            // database error, get groups result null
+            res.status(400).json({'message':response.body , 'successful' : 'false', 'info' : ''});
+        }else{
+            // status exception
+            res.status(500).json({'message':utils.message("MSG003-CM-E"), 'successful' : 'false', 'info' : ''});
+        }
+    });
+});
+
+/**
+ * POST: add member task
+ * params: author = Id user, token, Id = groupId, memberId, task
+ */
+router.post('/addTask', function (req, res) {
+    // register using api to maintain clean separation between layers
+    request.post({
+        url: config.apiUrl + '/members/addTask',
+        form: req.body,
+        json: true
+    }, function (error, response, body) {
+        if (error) {
+            // system error
+            res.status(401).json({'message':utils.message("MSG001-CM-I") , 'successful' : 'false', 'info' : ''});
+        }else if (response.statusCode == 200) {
+            // add task successful
+            return res.status(200).json({'message':utils.message("MSG009-MB-I") , 'successful' : 'true', 'info' : ""});
+        }else if(response.statusCode == 400){
+            // database error, get groups result null
+            res.status(400).json({'message':response.body , 'successful' : 'false', 'info' : ''});
+        }else{
+            // status exception
+            res.status(500).json({'message':utils.message("MSG003-CM-E"), 'successful' : 'false', 'info' : ''});
+        }
+    });
+});
+
+/**
+ * POST: get member task
+ * params: author = Id user, Id = groupId
+ */
+router.post('/getTask', function (req, res) {
+    // register using api to maintain clean separation between layers
+    request.post({
+        url: config.apiUrl + '/members/getTask',
+        form: req.body,
+        json: true
+    }, function (error, response, body) {
+        if (error) {
+            // system error
+            res.status(401).json({'message':utils.message("MSG001-CM-I") , 'successful' : 'false', 'info' : ''});
+        }else if (response.statusCode == 200) {
+            // get task successful
+            return res.status(200).json({'message':utils.message("MSG010-MB-I") , 'successful' : 'true', 'info' : body.task});
         }else if(response.statusCode == 400){
             // database error, get groups result null
             res.status(400).json({'message':response.body , 'successful' : 'false', 'info' : ''});

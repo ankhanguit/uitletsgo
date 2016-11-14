@@ -9,6 +9,8 @@
  * F- getGroup
  * F- permitMember
  * F- getMember
+ * F- addTask
+ * F- getTask
  *
  * Update: 10/27/2016.
  */
@@ -31,6 +33,8 @@ service.findMember = findMember;
 service.findOne = findOne;
 service.getGroup = getGroup;
 service.getMember = getMember;
+service.addTask = addTask;
+service.getTask = getTask;
 
 module.exports = service;
 
@@ -369,6 +373,7 @@ function getMember(groupId, memberId){
                             MEMBER_ID : 1,
                             JOIN_DATE: 1,
                             ROLE: 1,
+                            TASK: 1,
                             FIRSTNAME : "$MEMBER_INFO.FIRSTNAME" ,
                             LASTNAME : "$MEMBER_INFO.LASTNAME",
                             USERNAME: "$MEMBER_INFO.USERNAME",
@@ -393,6 +398,89 @@ function getMember(groupId, memberId){
                 deferred.reject(utils.message("MSG003-MB-E"));
             }
 
+        });
+
+    return deferred.promise;
+}
+/**
+ * Add member task
+ * @param groupId
+ * @param memberId
+ * @param task
+ * @returns {*|promise}
+ */
+function addTask(groupId, memberId, task) {
+
+    var deferred = Q.defer();
+
+    var set = {
+        TASK: task
+    };
+
+    // validation
+    var groupDb = db.collection("group_member_" + groupId);
+
+    groupDb.findOne(
+        { MEMBER_ID: mongo.helper.toObjectID(memberId)},
+        function (err, member) {
+            if (err){
+                // database error
+                deferred.reject(utils.message("MSG002-CM-E"));
+                console.log("[" + new Date()  + "][group.service.js][addTask] : " + err.name + ': ' + err.message);
+            }
+
+            // member exists
+            if(member) {
+                groupDb.update(
+                    { MEMBER_ID: mongo.helper.toObjectID(member_Id) },
+                    { $set: set },
+                    function (err, doc) {
+                        if (err){
+                            // database error
+                            deferred.reject(utils.message("MSG002-CM-E"));
+                            console.log("[" + new Date()  + "][group.service.js][lockMember] : " + err.name + ': ' + err.message);
+                        }
+                        var msg = {success: true};
+                        deferred.resolve(msg);
+                    });
+
+            }else{
+                deferred.reject(utils.message("MSG003-MB-E"));
+            }
+        });
+
+    return deferred.promise;
+}
+
+/**
+ * Get member task
+ * @param groupId
+ * @param memberId
+ * @param task
+ * @returns {*|promise}
+ */
+function getTask(groupId, memberId) {
+
+    var deferred = Q.defer();
+
+    // validation
+    var groupDb = db.collection("group_member_" + groupId);
+
+    groupDb.findOne(
+        { MEMBER_ID: mongo.helper.toObjectID(memberId)},
+        function (err, member) {
+            if (err){
+                // database error
+                deferred.reject(utils.message("MSG002-CM-E"));
+                console.log("[" + new Date()  + "][group.service.js][getTask] : " + err.name + ': ' + err.message);
+            }
+
+            // member exists
+            if(member) {
+                deferred.resolve(member.TASK);
+            }else{
+                deferred.reject(utils.message("MSG003-MB-E"));
+            }
         });
 
     return deferred.promise;
