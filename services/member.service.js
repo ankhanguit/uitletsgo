@@ -420,7 +420,7 @@ function addTask(groupId, memberId, task) {
     // validation
     var groupDb = db.collection("group_member_" + groupId);
 
-    groupDb.findOne(
+    groupDb.findOne(memberId
         { MEMBER_ID: mongo.helper.toObjectID(memberId)},
         function (err, member) {
             if (err){
@@ -432,7 +432,7 @@ function addTask(groupId, memberId, task) {
             // member exists
             if(member) {
                 groupDb.update(
-                    { MEMBER_ID: mongo.helper.toObjectID(member_Id) },
+                    { MEMBER_ID: mongo.helper.toObjectID(memberId) },
                     { $set: set },
                     function (err, doc) {
                         if (err){

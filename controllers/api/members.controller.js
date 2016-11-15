@@ -275,7 +275,7 @@ function getTask(req, res){
 
     // get member task
     function getMemberTask(){
-        memberService.addTask(group_id, author)
+        memberService.getTask(group_id, author)
             .then(function (task) {
                 res.status(200).send({task: task});
             })
