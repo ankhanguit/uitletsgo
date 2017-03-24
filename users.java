@@ -1,20 +1,9 @@
-/**
- * CREATED BY : KHANG-VA
- * Date : 2017/03/17
- * Copyright (c) 2000-2008 FUJINET, All Rights Reserved.
- * 
- */
 package vn.fjs.live.dto;
 
 import java.io.Serializable;
 
 import lombok.Data;
 
-/**
- * Thông tin người đùng ánh xạ đến table fu001 của database
- * @author khang-va
- *
- */
 @Data
 public class Users implements Serializable{
 	
