@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vn.fjs.live.persistence.AccountMapper">
+
+	<resultMap type="vn.fjs.live.dto.Users" id="UsersMap">
+		<id column="id" property="id" />
+		<result column="fu001_name" property="name" />
+		<result column="fu001_email" property="email" />
+		<result column="fu001_avatar" property="avatar" />
+		<result column="fu001_birthday" property="birthday" />
+		<result column="fu001_gender" property="gender" />
+	</resultMap>
+	
+	<select id="login" resultMap="UsersMap">
+		SELECT 
+			  id
+			, fu001_name
+			, fu001_email
+			, fu001_avatar
+			, fu001_birthday
+			, fu001_gender
+		FROM fu001
+		
+		<where>
+			AND fu001_name = #{username} 
+			AND fu001_pass = #{password}
+		</where>
+	</select>
+
+</mapper>
