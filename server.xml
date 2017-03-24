@@ -1,0 +1,3 @@
+ <Context docBase="live_FJS" path="/live_FJS" reloadable="true" source="org.eclipse.jst.jee.server:live_FJS">
+      	<Resource auth="Container" driverClassName="org.postgresql.Driver" maxActive="20" maxIdle="10" maxWait="-1" name="jdbc/postgres" password="Panda!1994" type="javax.sql.DataSource" url="jdbc:postgresql://172.16.10.51:5432/liveDb" username="postgres"/>
+      </Context>
