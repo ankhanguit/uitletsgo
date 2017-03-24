@@ -1,9 +1,4 @@
-/**
- * CREATED BY : KHANG-VA
- * Date : 2017/02/27
- * Copyright (c) 2000-2008 FUJINET, All Rights Reserved.
- * 
- */
+
 package vn.fjs.live.controller.api;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
