@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/security 
+		http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/jee
+		http://www.springframework.org/schema/jee/spring-jee.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<context:annotation-config/>
+	<context:component-scan base-package="vn.fjs.live.*" scoped-proxy="targetClass" />
+
+	<bean id="characterEncodingFilter" class="org.springframework.web.filter.CharacterEncodingFilter">
+		<property name="encoding" value="utf-8" />
+		<property name="forceEncoding" value="true" />
+	</bean>
+
+	<bean id="springSecurityFilterChain" class="org.springframework.security.web.FilterChainProxy">
+		<security:filter-chain-map request-matcher="ant">
+			<security:filter-chain pattern="/resources/**" filters="none" />
+			<security:filter-chain pattern="/**" filters="characterEncodingFilter" />
+		</security:filter-chain-map>
+	</bean>
+
+	<jee:jndi-lookup id="dataSource" jndi-name="jdbc/postgres" lazy-init="true" />
+	<bean id="lazyDataSource" class="org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy">
+		<property name="targetDataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="lazyDataSource" />
+	</bean>
+	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="lazyDataSource" />
+		<property name="typeAliasesPackage" value="vn.fjs.live.domain" />
+	</bean>
+
+	<bean class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory" />
+	</bean>
+
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+		<property name="basePackage" value="vn.fjs.live.persistence" />
+		<property name="annotationClass" value="org.apache.ibatis.annotations.Mapper" />
+	</bean>
+
+	<!-- MVC -->
+	<mvc:annotation-driven content-negotiation-manager="contentNegotiationManager">
+		<mvc:message-converters>
+			<beans:bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+				<property name="prefixJson" value="false" />
+				<property name="supportedMediaTypes" value="application/json" />
+				<beans:property name="objectMapper" ref="objectMapper" />
+			</beans:bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+	
+	<mvc:resources mapping="/resources/**" location="/resources/" cache-period="31556926" />
+
+	<bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+		<property name="favorPathExtension" value="false" />
+		<property name="favorParameter" value="true" />
+		<property name="mediaTypes">
+			<value>
+				json=application/json
+			</value>
+		</property>
+	</bean>
+
+	<!-- Jackson -->
+	<bean id="objectMapper" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean">
+		<property name="featuresToDisable">
+			<beans:array>
+				<util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS" />
+			</beans:array>
+		</property>
+		<property name="featuresToEnable">
+			<beans:array>
+				<util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT" />
+			</beans:array>
+		</property>
+		<property name="serializationInclusion" value="NON_NULL" />
+		<property name="dateFormat">
+			<bean class="com.fasterxml.jackson.databind.util.StdDateFormat" />
+		</property>
+	</bean>
+</beans>
