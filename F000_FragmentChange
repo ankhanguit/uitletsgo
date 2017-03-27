@@ -1,0 +1,29 @@
+package com.example.khang_va.fujinet_v11.view;
+
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
+
+import com.example.khang_va.fujinet_v11.R;
+
+/**
+ * Created by khang-va on 2017/03/03.
+ */
+
+
+public class F000_FragmentChange {
+
+    public static void switch_Screen(Fragment current, Fragment next){
+        FragmentTransaction transaction = current.getFragmentManager().beginTransaction();
+        transaction.replace(R.id.Frame, next);
+        transaction.commit();
+    }
+
+
+    public static void switch_Screen(AppCompatActivity root, Fragment next){
+        FragmentTransaction transaction = root.getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.Frame, next);
+        transaction.commit();
+    }
+}
