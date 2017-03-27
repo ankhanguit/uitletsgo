@@ -1,4 +1,4 @@
-package com.example.khang_va.fujinet_v11.view;
+
 
 import android.app.ActivityManager;
 import android.content.Intent;
@@ -12,11 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-
-import com.example.khang_va.fujinet_v11.R;
-import com.example.khang_va.fujinet_v11.events.VersionEvent;
-import com.example.khang_va.fujinet_v11.service.S000_CommunicateService;
-import com.example.khang_va.fujinet_v11.service.S000_CommunicateService_;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.SystemService;
@@ -217,7 +212,7 @@ public class A000_FragmentActivity extends AppCompatActivity
         int currentTaskId = -1;
 
         for (int i = 0; i < recentTasks.size(); i++) {
-            if (recentTasks.get(i).baseActivity.toShortString().contains("Fujinet")) {
+            if (recentTasks.get(i).baseActivity.toShortString().contains("aaa")) {
                 currentTaskId = recentTasks.get(i).id;
             }
         }
