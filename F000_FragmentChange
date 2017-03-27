@@ -1,11 +1,4 @@
-package com.example.khang_va.fujinet_v11.view;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
-
-import com.example.khang_va.fujinet_v11.R;
 
 /**
  * Created by khang-va on 2017/03/03.
