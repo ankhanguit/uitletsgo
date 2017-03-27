@@ -1,0 +1,242 @@
+package com.example.khang_va.fujinet_v11.view;
+
+import android.app.ActivityManager;
+import android.content.Intent;
+import android.support.annotation.AnyThread;
+import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+
+import com.example.khang_va.fujinet_v11.R;
+import com.example.khang_va.fujinet_v11.events.VersionEvent;
+import com.example.khang_va.fujinet_v11.service.S000_CommunicateService;
+import com.example.khang_va.fujinet_v11.service.S000_CommunicateService_;
+
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.SystemService;
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.ViewById;
+import org.androidannotations.api.BackgroundExecutor;
+import org.androidannotations.annotations.EActivity;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URISyntaxException;
+import java.util.List;
+
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
+
+/**
+ * Created by khang-va on 2017/03/06.
+ */
+@EActivity(R.layout.a000_fragment_activity_view)
+public class A000_FragmentActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
+
+    @ViewById
+    Toolbar toolbar;
+
+    @ViewById
+    DrawerLayout drawer;
+
+    @ViewById
+    NavigationView navigationView;
+
+    boolean lockedRecentButton = false;
+
+    @SystemService
+    ActivityManager activityManager;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @AfterViews
+    void initialize(){
+
+        setSupportActionBar(toolbar);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+        navigationView.setNavigationItemSelectedListener(this);
+
+        S000_CommunicateService_.intent(this.getApplication()).start();
+        boolean isUpdate = getIntent().getBooleanExtra("isUpdate", false);
+
+        if(isUpdate) {
+            F006_UpdateView_ view = new F006_UpdateView_();
+            F000_FragmentChange.switch_Screen(this, view);
+        } else {
+            V000_WelcomeView_ view = new V000_WelcomeView_();
+            F000_FragmentChange.switch_Screen(this, view);
+        }
+    }
+
+    @Subscribe
+    @AnyThread
+    public void updateEvent(VersionEvent event) {
+        String message = "New version " + event.version + " is available!";
+        Snackbar snackbar = Snackbar.make(drawer, message, Snackbar.LENGTH_LONG);
+        snackbar.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        super.onBackPressed();
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.v000__welcome_view, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_home) {
+            V000_WelcomeView_ view = new V000_WelcomeView_();
+            F000_FragmentChange.switch_Screen(this, view);
+            Snackbar snackbar = Snackbar.make(drawer, "Welcome Screen", Snackbar.LENGTH_SHORT);
+            snackbar.show();
+        } else if (id == R.id.nav_update) {
+            F006_UpdateView_ view = new F006_UpdateView_();
+            F000_FragmentChange.switch_Screen(this, view);
+            Snackbar snackbar = Snackbar.make(drawer, "Update Screen", Snackbar.LENGTH_SHORT);
+            snackbar.show();
+
+        } else if (id == R.id.nav_database) {
+            F003_SqlliteView_ view = new F003_SqlliteView_();
+            F000_FragmentChange.switch_Screen(this, view);
+            Snackbar snackbar = Snackbar.make(drawer, "Database Screen", Snackbar.LENGTH_SHORT);
+            snackbar.show();
+
+        } else if (id == R.id.nav_manage) {
+            F004_SettingsView_ view = new F004_SettingsView_();
+            F000_FragmentChange.switch_Screen(this, view);
+            Snackbar snackbar = Snackbar.make(drawer, "Setting Screen", Snackbar.LENGTH_SHORT);
+            snackbar.show();
+
+        } else if (id == R.id.nav_about) {
+            F005_AboutView_ view = new F005_AboutView_();
+            F000_FragmentChange.switch_Screen(this, view);
+            Snackbar snackbar = Snackbar.make(drawer, "About Screen", Snackbar.LENGTH_SHORT);
+            snackbar.show();
+
+        } else if (id == R.id.nav_account) {
+
+            F002_AccountView_ view = new F002_AccountView_();
+            F000_FragmentChange.switch_Screen(this, view);
+            Snackbar snackbar = Snackbar.make(drawer, "Account View", Snackbar.LENGTH_SHORT);
+            snackbar.show();
+        }
+
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+
+        if (!hasFocus) {
+            if (shouldBackToFront()) {
+                if (!lockedRecentButton) {
+                    lockedRecentButton = true;
+
+                    int taskId = fetch_CurrentTaskId();
+                    start_TaskMoveToFront(taskId);
+                    schedule_ToStopTaskMoveToFront();
+                }
+            }
+
+        }
+    }
+
+    private boolean shouldBackToFront() {
+
+        boolean should = true;
+
+        List<ActivityManager.RunningTaskInfo> recentTasks = activityManager.getRunningTasks(Integer.MAX_VALUE);
+
+        for (int i = 0; i < recentTasks.size(); i++) {
+            if (recentTasks.get(i).baseActivity.toShortString().contains("com.android.settings")) {
+                should = false;
+            }
+        }
+
+        return should;
+    }
+
+    int fetch_CurrentTaskId() {
+
+        List<ActivityManager.RunningTaskInfo> recentTasks = activityManager.getRunningTasks(Integer.MAX_VALUE);
+        int currentTaskId = -1;
+
+        for (int i = 0; i < recentTasks.size(); i++) {
+            if (recentTasks.get(i).baseActivity.toShortString().contains("Fujinet")) {
+                currentTaskId = recentTasks.get(i).id;
+            }
+        }
+
+        return currentTaskId;
+    }
+
+    @Background(id = "task_MoveToFront", delay = 80L)
+    void start_TaskMoveToFront(int taskId) {
+
+        activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME);
+
+        start_TaskMoveToFront(taskId);
+    }
+
+    @Background(delay = 1000L)
+    void schedule_ToStopTaskMoveToFront() {
+        this.lockedRecentButton = false;
+
+        BackgroundExecutor.cancelAll("task_MoveToFront", false);
+    }
+}
